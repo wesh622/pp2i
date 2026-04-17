@@ -1,0 +1,1 @@
+Dans ce dossier seront stockés l'ensemble des fichiers executés .o pour eviter de polluer le projet
