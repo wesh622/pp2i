@@ -10,4 +10,14 @@ typedef struct _Joueur {
     int score; // Score du joueur 
 } Joueur;
 
+//Debut Omar
+void definirJoueur(Joueur *j, int id, char *name);
+void definirIA(Joueur *j, int id);  
+void enleverJoueur(Joueur *j);
+void ajouterpoints(Joueur *j, int points);
+int peutposermeeple(Joueur *j);
+void posermeeple(Joueur *j, int index);
+void rendremeeple(Joueur *j, int idMeeple);
+//fin
+
 #endif

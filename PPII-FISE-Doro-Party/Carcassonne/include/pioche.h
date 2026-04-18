@@ -8,4 +8,10 @@ typedef struct _Pioche {
     int nbresrestantes; // Indique le nombre de tuiles restantes à piocher
 } Pioche;
 
+Pioche* init_pioche(int seed);
+Tuiles* piocher(Pioche* p);
+int pioche_vide(Pioche* p);
+void free_pioche(Pioche* p);
+
 #endif
+

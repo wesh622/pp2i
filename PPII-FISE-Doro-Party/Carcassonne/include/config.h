@@ -6,13 +6,15 @@
 
 typedef struct Config{
     int mode; //1 cli 2 sdl 3 rien
-    int nbr_joueur;
     Joueur* tab; //tableau de joueurs
+    int nbr_joueur;
     int seed;
     int ai;
     int max_turn;
 }config;
 
 config* configuration(int mode, int nb_joueur, int seed, int ai,int max_turn);
+void print_config(config* configuration);
+void free_config(config* c);
 
 #endif

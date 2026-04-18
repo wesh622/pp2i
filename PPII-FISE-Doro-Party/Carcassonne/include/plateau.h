@@ -8,5 +8,11 @@ typedef struct _Plateau {
     int occupes[TAILLE_MAX][TAILLE_MAX]; // 0 si l'emplacement est vide et 1 sinon
 } Plateau;
 
+Plateau* init_plateau();
+int peut_poser_tuile(Plateau* p, int x, int y);
+void poser_tuile(Plateau* p, Tuiles tuile, int x, int y);
+void afficher_plateau(Plateau* p);
+void free_plateau(Plateau* p);
 
 #endif
+

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "config.h"
+#include "joueur.h"
 
 config* configuration(int mode, int nb_joueur, int seed, int ai,int max_turn){
     config* c = malloc(sizeof(config));
@@ -15,10 +16,14 @@ config* configuration(int mode, int nb_joueur, int seed, int ai,int max_turn){
     assert(tab != NULL);
     for(int i=0;i<nb_joueur;i++){
         printf("Entrer les infos du Joueurs %d",i);
-        //tab[i] = set_joueur();  //fonction non defini mais qui servirait à definir les infos du joueur
+        char nom[20];
+        printf("Nom du joueur %d: ", i+1);
+        scanf("%19s", nom);
+        definirJoueur(&c->tab[i], i+1, nom);
+        c->tab[i].actif = 1;
     }
     for(int i=nb_joueur;i<(nb_joueur+ai);i++){
-        //tab[i] = set_ia(); //fonction non defini mais qui servirait à definir aleatoirement les infos de l'ia en tant que joueur
+        definirIA(&c->tab[i], i+1);
     }
     return c;
 }
@@ -35,5 +40,12 @@ void print_config(config* configuration){
         printf("nombre de joueur ia: %d \n",configuration->ai);
         printf("nombre de tours maximum: %d \n",configuration->max_turn);
         printf("nombre de joueur reel: %d \n",configuration->nbr_joueur);
+    }
+}
+
+void free_config(config* c){
+    if(c){
+        if(c->tab) free(c->tab);
+        free(c);
     }
 }

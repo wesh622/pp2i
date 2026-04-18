@@ -16,10 +16,6 @@ config* parse_argument(int argc,char** argv){
     int ai = 0;
     int max_turns = -1; // -1 = infini oui oui je fais ce que je veux
     bool deja_vu[] = {false,false,false,false,false};
-    if((argc - 1) % 2 != 0){
-        printf("Erreur\n");
-        assert(false);
-    }
     if(argc == 2 && (strcmp(argv[1],"--help") == 0)){
         printf(
         "Usage: carcassonne [options]\n"
@@ -32,7 +28,11 @@ config* parse_argument(int argc,char** argv){
         "  -t --max-turns N      limite de tours\n"
         "  --help                affiche cette aide\n"
         );
-        assert(false);
+        return NULL;
+    }
+    if((argc - 1) % 2 != 0){
+        printf("Erreur\n");
+        return NULL;
     }
     else{
         for(int i =0;i<argc/2;i++){
@@ -41,7 +41,7 @@ config* parse_argument(int argc,char** argv){
             if(strcmp(argv[2*i+1],"--mode") == 0 || strcmp(argv[2*i+1],"-m") == 0){
                 if(deja_vu[0]){
                     printf("Erreur\n");
-                    assert(false);
+                    return NULL;
                 }
                 deja_vu[0] = true;
                 long x = strtol(argv[2*(i+1)], &end, 10);
@@ -49,7 +49,7 @@ config* parse_argument(int argc,char** argv){
                 int mode_prime = atoi(argv[2*(i+1)]);
                 if(mode_prime >2 || mode_prime<0){
                     printf("Erreur\n");
-                    assert(false);
+                    return NULL;
                 }
                 mode = mode_prime;
                 a = true;
@@ -58,7 +58,7 @@ config* parse_argument(int argc,char** argv){
             else if(strcmp(argv[2*i+1],"--players") == 0 || strcmp(argv[2*i+1],"-p") == 0){
                 if(deja_vu[1]){
                     printf("Erreur\n");
-                    assert(false);
+                    return NULL;
                 }
                 deja_vu[1] = true;
                 long x = strtol(argv[2*(i+1)], &end, 10);
@@ -66,7 +66,7 @@ config* parse_argument(int argc,char** argv){
                 int prime = atoi(argv[2*(i+1)]);
                 if(prime >5 || prime<2){
                     printf("Erreur\n");
-                    assert(false);
+                    return NULL;
                 }
                 nb_joueur = prime;
                 a = true;
@@ -75,7 +75,7 @@ config* parse_argument(int argc,char** argv){
             else if(strcmp(argv[2*i+1],"--seed") == 0 || strcmp(argv[2*i+1],"-s") == 0){
                 if(deja_vu[2]){
                     printf("Erreur\n");
-                    assert(false);
+                    return NULL;
                 }
                 deja_vu[2] = true;
                 long x = strtol(argv[2*(i+1)], &end, 10);
@@ -83,7 +83,7 @@ config* parse_argument(int argc,char** argv){
                 int prime = atoi(argv[2*(i+1)]);
                 if(prime<0){
                     printf("Erreur\n");
-                    assert(false);
+                    return NULL;
                 }
                 seed = prime;
                 a = true;
@@ -92,7 +92,7 @@ config* parse_argument(int argc,char** argv){
             else if(strcmp(argv[2*i+1],"--ai") == 0 || strcmp(argv[2*i+1],"-a") == 0){
                 if(deja_vu[3]){
                     printf("Erreur\n");
-                    assert(false);
+                    return NULL;
                 }
                 deja_vu[3] = true;
                 long x = strtol(argv[2*(i+1)], &end, 10);
@@ -100,7 +100,7 @@ config* parse_argument(int argc,char** argv){
                 int prime = atoi(argv[2*(i+1)]);
                 if(prime >5 || prime<0){
                     printf("Erreur\n");
-                    assert(false);
+                    return NULL;
                 }
                 ai = prime;
                 a = true;
@@ -109,7 +109,7 @@ config* parse_argument(int argc,char** argv){
             else if(strcmp(argv[2*i+1],"--max-turns") == 0 || strcmp(argv[2*i+1],"-t")== 0){
                 if(deja_vu[4]){
                     printf("Erreur\n");
-                    assert(false);
+                    return NULL;
                 }
                 deja_vu[4] = true;
                 long x = strtol(argv[2*(i+1)], &end, 10);
@@ -117,7 +117,7 @@ config* parse_argument(int argc,char** argv){
                 int prime = atoi(argv[2*(i+1)]);
                 if(prime<0){
                     printf("Erreur\n");
-                    assert(false);
+                    return NULL;
                 }
                 max_turns = prime;
                 a = true;
@@ -125,15 +125,14 @@ config* parse_argument(int argc,char** argv){
             }
             if(!a){
                 printf("Erreur\n");
-                assert(false);
+                return NULL;
             }
         }
         if(ai>nb_joueur){
             printf("Erreur\n");
-            assert(false);
+            return NULL;
         }
-        //return configuration(mode,nb_joueur,seed,ai,max_turns);
-        return NULL;
+        return configuration(mode,nb_joueur,seed,ai,max_turns);
     }
     return NULL;
 }

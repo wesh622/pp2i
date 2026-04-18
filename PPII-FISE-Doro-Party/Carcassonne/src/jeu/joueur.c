@@ -19,6 +19,27 @@ void definirJoueur(Joueur *j, int id, char *name) {
    
 }
 
+//debut Omar
+
+void definirIA(Joueur *j, int id) {
+    j->idjoueur = id;
+    char nom_ia[20];
+    sprintf(nom_ia, "IA_%d", id);
+    strncpy(j->nom, nom_ia, 19);
+    j->nom[19] = '\0';
+    
+    j->score = 0;
+    j->actif = 1;
+
+    for (int i = 0; i < 7; i++) {
+        j->stock[i].id = i + 1;
+        j->stock[i].etat = 1;
+        j->stock[i].idjoueur = id;
+    }
+}
+
+//fin Omar
+
 void enleverJoueur(Joueur *j) { 
     j->actif = 0;
     j->idjoueur = -1;
