@@ -1,0 +1,13 @@
+# Binaires compilés
+exec/
+carcassonne
+test_argc
+test_plateau
+test_score
+test_pioche
+test_joueur
+test_tuile
+test_meeple
+
+# Objets de test
+test/*.o
