@@ -10,7 +10,8 @@ SRC = src/jeu/main.c \
       src/jeu/score.c \
       src/jeu/affichage.c \
       src/autres/argc.c \
-      src/autres/config.c
+      src/autres/config.c \
+	  src/jeu/meeple.c
 
 OBJ = $(SRC:%.c=exec/%.o)
 
@@ -47,16 +48,17 @@ exec/%.o: %.c
 $(NAME): $(OBJ)
 	$(cc) $(CFLAGS) $(OBJ) -o $(NAME)
 
-test: $(TESTOBJ) src/autres/argc.c src/autres/config.c src/jeu/joueur.c
-	CARCASSONNE_TEST=1 $(cc) $(CFLAGS) $(TESTSRC) src/autres/argc.c src/autres/config.c src/jeu/joueur.c -o $(TEST)
-	CARCASSONNE_TEST=1 ./$(TEST)
+
+test: $(TESTOBJ) src/autres/argc.c src/autres/config.c src/jeu/joueur.c src/jeu/meeple.c
+	CARCASSONNE_TEST=1 $(cc) $(CFLAGS) $(TESTSRC) src/autres/argc.c src/autres/config.c src/jeu/joueur.c src/jeu/meeple.c -o $(TEST)	
+	./$(TEST)
 
 test_plateau: $(TESTSRC_PLATEAU)
-	$(cc) $(CFLAGS) $(TESTSRC_PLATEAU) src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c -o $(TEST_PLATEAU)
+	$(cc) $(CFLAGS) $(TESTSRC_PLATEAU) src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/meeple.c src/jeu/score.c -o $(TEST_PLATEAU)
 	./$(TEST_PLATEAU)
 
 test_score: $(TESTSRC_SCORE)
-	$(cc) $(CFLAGS) $(TESTSRC_SCORE) src/jeu/score.c src/jeu/joueur.c src/jeu/plateau.c src/jeu/tuiles.c -o $(TEST_SCORE)
+	$(cc) $(CFLAGS) $(TESTSRC_SCORE) src/jeu/score.c src/jeu/joueur.c src/jeu/plateau.c src/jeu/tuiles.c src/jeu/meeple.c -o $(TEST_SCORE)
 	./$(TEST_SCORE)
 
 test_pioche: $(TESTSRC_PIOCHE)
@@ -64,7 +66,7 @@ test_pioche: $(TESTSRC_PIOCHE)
 	./$(TEST_PIOCHE)
 
 test_joueur: $(TESTSRC_JOUEUR)
-	$(cc) $(CFLAGS) $(TESTSRC_JOUEUR) src/jeu/joueur.c -o $(TEST_JOUEUR)
+	$(cc) $(CFLAGS) $(TESTSRC_JOUEUR) src/jeu/joueur.c src/jeu/meeple.c -o $(TEST_JOUEUR)
 	./$(TEST_JOUEUR)
 
 test_tuile: $(TESTSRC_TUILE)
@@ -72,7 +74,7 @@ test_tuile: $(TESTSRC_TUILE)
 	./$(TEST_TUILE)
 
 test_meeple: $(TESTSRC_MEEPLE)
-	$(cc) $(CFLAGS) $(TESTSRC_MEEPLE) src/jeu/meeple.c src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c -o $(TEST_MEEPLE)
+	$(cc) $(CFLAGS) $(TESTSRC_MEEPLE) src/jeu/meeple.c src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/score.c -o $(TEST_MEEPLE)
 	./$(TEST_MEEPLE)
 
 clean:
