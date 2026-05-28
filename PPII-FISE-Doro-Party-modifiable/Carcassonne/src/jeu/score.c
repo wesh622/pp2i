@@ -198,3 +198,76 @@ void verifier_et_scorer_structures(Plateau* p, int x, int y, Joueur joueurs[], i
         }
     }
 }
+
+// calcul du score final en fin de partie (structures incompletes)
+void score_final(Plateau* p, Joueur joueurs[], int nb_joueurs) {
+    int visite[TAILLE_MAX][TAILLE_MAX] = {0};
+
+    printf("\n=== SCORE FINAL (structures incompletes) ===\n");
+
+    for (int x = 0; x < TAILLE_MAX; x++) {
+        for (int y = 0; y < TAILLE_MAX; y++) {
+            if (!p->occupes[x][y] || visite[x][y]) continue;
+
+            Tuiles t = p->grille[x][y];
+            visite[x][y] = 1;
+
+            // abbaye incomplete : 1 pt par tuile adjacente + elle meme
+            if (t.center == ABBAYE) {
+                int meeple_present = 0;
+                for (int i = 0; i < nb_joueurs && !meeple_present; i++) {
+                    for (int m = 0; m < 7; m++) {
+                        if (joueurs[i].stock[m].etat == 0 &&
+                            joueurs[i].stock[m].posX == x &&
+                            joueurs[i].stock[m].posY == y) {
+                            meeple_present = 1;
+                            break;
+                        }
+                    }
+                }
+                if (meeple_present) {
+                    int pts = 1;
+                    for (int dx = -1; dx <= 1; dx++) {
+                        for (int dy = -1; dy <= 1; dy++) {
+                            if (dx == 0 && dy == 0) continue;
+                            int nx = x + dx, ny = y + dy;
+                            if (nx >= 0 && nx < TAILLE_MAX && ny >= 0 && ny < TAILLE_MAX && p->occupes[nx][ny])
+                                pts++;
+                        }
+                    }
+                    int visite_abbaye[TAILLE_MAX][TAILLE_MAX] = {0};
+                    visite_abbaye[x][y] = 1;
+                    attribuer_points_et_recuperer_meeples(visite_abbaye, pts, joueurs, nb_joueurs);
+                    printf("Abbaye incomplete en (%d,%d) : %d pts\n", x, y, pts);
+                }
+            }
+
+            // ville incomplete : 1 pt par tuile + 1 pt par blason (compter_points_ville retourne deja ca)
+            if (t.a == VILLE || t.b == VILLE || t.c == VILLE || t.d == VILLE ||
+                t.a == VILLE_BOUCLIER || t.b == VILLE_BOUCLIER || t.c == VILLE_BOUCLIER || t.d == VILLE_BOUCLIER) {
+                int visite_ville[TAILLE_MAX][TAILLE_MAX] = {0};
+                int pts = compter_points_ville(p, x, y, visite_ville);
+                for (int i = 0; i < TAILLE_MAX; i++)
+                    for (int j = 0; j < TAILLE_MAX; j++)
+                        if (visite_ville[i][j]) visite[i][j] = 1;
+                attribuer_points_et_recuperer_meeples(visite_ville, pts, joueurs, nb_joueurs);
+                if (pts > 0) printf("Ville incomplete : %d pts\n", pts);
+            }
+
+            // route incomplete : 1 pt par tuile
+            if (t.a == ROUTE_PRAIRIE || t.b == ROUTE_PRAIRIE || t.c == ROUTE_PRAIRIE || t.d == ROUTE_PRAIRIE) {
+                int visite_route[TAILLE_MAX][TAILLE_MAX] = {0};
+                int pts = compter_points_route(p, x, y, visite_route);
+                for (int i = 0; i < TAILLE_MAX; i++)
+                    for (int j = 0; j < TAILLE_MAX; j++)
+                        if (visite_route[i][j]) visite[i][j] = 1;
+                attribuer_points_et_recuperer_meeples(visite_route, pts, joueurs, nb_joueurs);
+                if (pts > 0) printf("Route incomplete : %d pts\n", pts);
+            }
+        }
+    }
+
+    afficher_scores(joueurs, nb_joueurs);
+    int gagnant = joueur_gagnant(joueurs, nb_joueurs);
+    printf("=== GAGNANT : %s avec %d pts ===\n", joueurs[gagnant].nom, joueurs[gagnant].score);
+}

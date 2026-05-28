@@ -1,4 +1,4 @@
-.PHONY: test clean all
+.PHONY: test clean all req cli sdl
 cc = clang
 CFLAGS = -std=c99 -Wall -Wextra -Wpedantic -g -Iinclude
 
@@ -75,6 +75,15 @@ test_tuile: $(TESTSRC_TUILE)
 test_meeple: $(TESTSRC_MEEPLE)
 	$(cc) $(CFLAGS) $(TESTSRC_MEEPLE) src/jeu/meeple.c src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/score.c -o $(TEST_MEEPLE)
 	./$(TEST_MEEPLE)
+
+req:
+	apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
+
+cli: $(NAME)
+	./$(NAME) -m 1 -p 2
+
+sdl: $(NAME)
+	./$(NAME) -m 2 -p 2
 
 clean:
 	rm -rf exec $(TESTOBJ) $(NAME) $(TEST) $(TEST_PLATEAU) $(TEST_SCORE) $(TEST_PIOCHE) $(TEST_JOUEUR) $(TEST_TUILE) $(TEST_MEEPLE)

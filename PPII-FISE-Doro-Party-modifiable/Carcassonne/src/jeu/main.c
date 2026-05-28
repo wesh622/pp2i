@@ -143,6 +143,9 @@ int main(int argc, char** argv){
         boucle_de_jeu(pioche, plateau, j, conf, total_joueurs);
     }
 
+    // score final (structures incompletes en fin de partie)
+    score_final(plateau, conf->tab, total_joueurs);
+
     // Libération mémoire
     free_pioche(pioche);
     free_plateau(plateau);
