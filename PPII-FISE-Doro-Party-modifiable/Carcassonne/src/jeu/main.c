@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "argc.h"
+#ifdef AVEC_SDL
+#include "sdl_boucle.h"
+#endif
 
 
 
@@ -134,8 +137,13 @@ int main(int argc, char** argv){
     afficher_plateau(plateau);
     printf("%d", conf->max_turn);
 
+#ifdef AVEC_SDL
+    if (conf->mode == 2) {
+        boucle_sdl_principale(plateau, pioche, conf, total_joueurs);
+    } else {
+#endif
     // Boucle de jeu :
-    for (int i = 0; i < conf->max_turn; i++) {
+    for (int i = 0; i < conf->max_turn && !pioche_vide(pioche); i++) {
         int tour = i+1;
         printf("\n=== TOUR N°%d ===\n", tour );
         int joueur_actuel = i % total_joueurs;
@@ -145,6 +153,9 @@ int main(int argc, char** argv){
 
     // score final (structures incompletes en fin de partie)
     score_final(plateau, conf->tab, total_joueurs);
+#ifdef AVEC_SDL
+    }
+#endif
 
     // Libération mémoire
     free_pioche(pioche);

@@ -1,6 +1,7 @@
 .PHONY: test clean all req cli sdl
 cc = clang
-CFLAGS = -std=c99 -Wall -Wextra -Wpedantic -g -Iinclude
+CFLAGS     = -std=c99 -Wall -Wextra -Wpedantic -g -Iinclude
+SDL_FLAGS  = $(shell sdl2-config --cflags --libs) -lSDL2_ttf
 
 SRC = src/jeu/main.c \
       src/jeu/tuiles.c \
@@ -13,7 +14,18 @@ SRC = src/jeu/main.c \
       src/autres/argc.c \
       src/autres/config.c
 
+SRC_SDL_INTERFACES = src/interfaces/sdl_init.c \
+                     src/interfaces/sdl_rendu.c \
+                     src/interfaces/sdl_plateau.c \
+                     src/interfaces/sdl_panel.c \
+                     src/interfaces/sdl_input.c \
+                     src/interfaces/sdl_meeple_overlay.c \
+                     src/interfaces/sdl_boucle.c \
+                     src/interfaces/sdl_fin.c
+
 OBJ = $(SRC:%.c=exec/%.o)
+
+NAME_SDL = carcassonne_sdl
 
 TESTSRC = test/test_argc.c
 TESTOBJ = $(TESTSRC:.c=.o)
@@ -76,14 +88,18 @@ test_meeple: $(TESTSRC_MEEPLE)
 	$(cc) $(CFLAGS) $(TESTSRC_MEEPLE) src/jeu/meeple.c src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/score.c -o $(TEST_MEEPLE)
 	./$(TEST_MEEPLE)
 
+$(NAME_SDL): $(SRC) $(SRC_SDL_INTERFACES)
+	@mkdir -p exec
+	$(cc) $(CFLAGS) -DAVEC_SDL $(SDL_FLAGS) $^ -o $@
+
 req:
 	apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
 
 cli: $(NAME)
 	./$(NAME) -m 1 -p 2
 
-sdl: $(NAME)
-	./$(NAME) -m 2 -p 2
+sdl: $(NAME_SDL)
+	./$(NAME_SDL) -m 2 -p 2
 
 clean:
-	rm -rf exec $(TESTOBJ) $(NAME) $(TEST) $(TEST_PLATEAU) $(TEST_SCORE) $(TEST_PIOCHE) $(TEST_JOUEUR) $(TEST_TUILE) $(TEST_MEEPLE)
+	rm -rf exec $(TESTOBJ) $(NAME) $(NAME_SDL) $(TEST) $(TEST_PLATEAU) $(TEST_SCORE) $(TEST_PIOCHE) $(TEST_JOUEUR) $(TEST_TUILE) $(TEST_MEEPLE)
