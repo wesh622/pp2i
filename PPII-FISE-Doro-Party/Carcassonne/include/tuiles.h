@@ -30,5 +30,8 @@ typedef struct _Tuiles {
 extern Tuiles tuiles_jeu[];  // Permet d'utiliser le tableau tuiles_jeu définit dans tuiles.c
 // dans l'ensemble des fichiers du projet
 
+Tuiles* tourner_vers_droite(Tuiles* t);
+Tuiles* tourner_vers_gauche(Tuiles* t);
+
 
 #endif

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "joueur.h"
+#include "meeple.h"
 #include <string.h>
 
 void definirJoueur(Joueur *j, int id, char *name) {
@@ -8,13 +9,12 @@ void definirJoueur(Joueur *j, int id, char *name) {
 
     strncpy(j->nom, name, 19);
     j->nom[19] = '\0';
-    
+    j->est_IA = 0;
+
     j->score = 0;
 
     for (int i = 0; i < 7; i++) {
-        j->stock[i].id = i + 1;
-        j->stock[i].etat = 1;
-        j->stock[i].idjoueur = id;
+        init_meeple(&j->stock[i], i + 1, id);
     }
    
 }
@@ -27,14 +27,13 @@ void definirIA(Joueur *j, int id) {
     sprintf(nom_ia, "IA_%d", id);
     strncpy(j->nom, nom_ia, 19);
     j->nom[19] = '\0';
+    j->est_IA = 1;
     
     j->score = 0;
     j->actif = 1;
 
     for (int i = 0; i < 7; i++) {
-        j->stock[i].id = i + 1;
-        j->stock[i].etat = 1;
-        j->stock[i].idjoueur = id;
+        init_meeple(&j->stock[i], i + 1, id);
     }
 }
 

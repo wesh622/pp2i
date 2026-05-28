@@ -2,15 +2,27 @@
 #define MEEPLE_H
 #include "tuiles.h"
 
-typedef struct _Meeple {
-    int id; // Entier qui va de 1 à 7 pour chaque joueur
-    int idjoueur; // Entier compris entre 1 et 4 qui permet de savoir à quel joueur appartient ce meeple
-    int etat; // 0 si le meeple est posé sur le plateau et 1 si il est disponible
-    int zone; // Entier compris entre 1 et 6, qui définit sur quel genre de zone est posé le meeple, donc on peut mettre HERBE par exemple vu que j'ai include le tuiles.h
-    int emplacement; // Précision : face a, b, c, d ou centre
-    int posX; // Coordonnée X sur le plateau
-    int posY; // Coordonnée Y sur le plateau
+struct _Joueur;
+struct _Plateau;
 
+typedef struct _Meeple {
+    int id; //de 1 a 7 pr chaque joueur
+    int idjoueur; //entre 1 et 5
+    int etat; //0 pose 1 dispo
+    int zone; //type zone (VILLE ROUTE etc)
+    int emplacement; //1=a 2=b 3=c 4=d 5=centre
+    int posX; //coord X (-1 si pa pose)
+    int posY; //coord Y (-1 si pa pose)
 } Meeple;
+
+void init_meeple(Meeple* m, int id, int idjoueur);
+int placer_meeple(Meeple* m, int posX, int posY, int zone, int emplacement);
+int peut_placer_meeple(struct _Plateau* plateau, int posX, int posY,int emplacement);
+void retirer_meeple(Meeple* m);
+int meeple_disponible(Meeple* m);
+void afficher_meeple(Meeple* m);
+int au_moins_un_meeple_disponible(struct _Joueur* j);
+Meeple* premier_meeple_disponible(struct _Joueur* j);
+void choix_meeple_IA(struct _Plateau* plateau, Tuiles tuile,struct _Joueur* j, int x, int y);
 
 #endif

@@ -8,6 +8,7 @@ typedef struct _Joueur {
     int actif; // 1 si il est dans la partie 0 s'il a quitté
     Meeple stock[7]; // Stock de meeple pour le joueur
     int score; // Score du joueur 
+    int est_IA; //0 si joueur, 1 si IA
 } Joueur;
 
 //Debut Omar
@@ -18,6 +19,7 @@ void ajouterpoints(Joueur *j, int points);
 int peutposermeeple(Joueur *j);
 void posermeeple(Joueur *j, int index);
 void rendremeeple(Joueur *j, int idMeeple);
+
 //fin
 
 #endif

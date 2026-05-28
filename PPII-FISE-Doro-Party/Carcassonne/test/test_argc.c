@@ -9,24 +9,24 @@
 
 //quelques tests unitaires pour test.c
 
-void test_argc(){
+void test_argc(void){
 
     {
         int argc = 1;
         char *argv[] = {"carcassonne"};
-        assert(parse_argument(argc,argv) == true);
+        assert(parse_argument(argc,argv) != NULL);
     }
 
     {
         int argc = 3;
         char *argv[] = {"carcassonne","-m","1"};
-        assert(parse_argument(argc,argv) == true);
+        assert(parse_argument(argc,argv) != NULL);
     }
 
     {
         int argc = 3;
         char *argv[] = {"carcassonne","-t","50"};
-        assert(parse_argument(argc,argv) == true);
+        assert(parse_argument(argc,argv) != NULL);
     }
 
     {
@@ -38,7 +38,7 @@ void test_argc(){
         "-a","1",
         "-s","42"
         };
-        assert(parse_argument(argc,argv) == true);
+        assert(parse_argument(argc,argv) != NULL);
     }
 
     {
@@ -51,26 +51,31 @@ void test_argc(){
         "-s","123",
         "-t","100"
         };
-        assert(parse_argument(argc,argv) == true);
+        assert(parse_argument(argc,argv) != NULL);
     }
 
     {
         int argc = 3;
         char *argv[] = {"carcassonne","-p","1"};
-        assert(parse_argument(argc,argv) == true);
+        assert(parse_argument(argc,argv) == NULL);
     }
 
     {
         int argc = 3;
         char *argv[] = {"carcassonne","-p","abc"};
-        assert(parse_argument(argc,argv) == false);
+        assert(parse_argument(argc,argv) == NULL);
     }
 
     {
         int argc = 2;
         char *argv[] = {"carcassonne","--help"};
-        assert(parse_argument(argc,argv) == true);
+        assert(parse_argument(argc,argv) == NULL);
     }
 
-    printf("Tout les tests sont passés");
+    printf("Tout les tests sont passés\n");
+}
+
+int main(void) {
+    test_argc();
+    return 0;
 }

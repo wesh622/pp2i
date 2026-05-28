@@ -6,15 +6,19 @@
 #include <assert.h>
 #include "argc.h"
 #include "config.h"
+#include <time.h>
+
+
 
 //fonction qui prend les parametres en entrée et verifie qu'ils sont correct
 
 config* parse_argument(int argc,char** argv){
+    srand(time(NULL));
     int mode = 0;
     int nb_joueur = 2;
     int seed = rand();
     int ai = 0;
-    int max_turns = -1; // -1 = infini oui oui je fais ce que je veux
+    int max_turns = 72;
     bool deja_vu[] = {false,false,false,false,false};
     if(argc == 2 && (strcmp(argv[1],"--help") == 0)){
         printf(
@@ -44,8 +48,11 @@ config* parse_argument(int argc,char** argv){
                     return NULL;
                 }
                 deja_vu[0] = true;
-                long x = strtol(argv[2*(i+1)], &end, 10);
-                assert(*end == '\0');
+                strtol(argv[2*(i+1)], &end, 10);
+                if (*end != '\0') {
+                    printf("Erreur\n");
+                    return NULL;
+                }
                 int mode_prime = atoi(argv[2*(i+1)]);
                 if(mode_prime >2 || mode_prime<0){
                     printf("Erreur\n");
@@ -61,8 +68,11 @@ config* parse_argument(int argc,char** argv){
                     return NULL;
                 }
                 deja_vu[1] = true;
-                long x = strtol(argv[2*(i+1)], &end, 10);
-                assert(*end == '\0');
+                strtol(argv[2*(i+1)], &end, 10);
+                if (*end != '\0') {
+                    printf("Erreur\n");
+                    return NULL;
+                }
                 int prime = atoi(argv[2*(i+1)]);
                 if(prime >5 || prime<2){
                     printf("Erreur\n");
@@ -78,8 +88,11 @@ config* parse_argument(int argc,char** argv){
                     return NULL;
                 }
                 deja_vu[2] = true;
-                long x = strtol(argv[2*(i+1)], &end, 10);
-                assert(*end == '\0');
+                strtol(argv[2*(i+1)], &end, 10);
+                if (*end != '\0') {
+                    printf("Erreur\n");
+                    return NULL;
+                }
                 int prime = atoi(argv[2*(i+1)]);
                 if(prime<0){
                     printf("Erreur\n");
@@ -95,8 +108,11 @@ config* parse_argument(int argc,char** argv){
                     return NULL;
                 }
                 deja_vu[3] = true;
-                long x = strtol(argv[2*(i+1)], &end, 10);
-                assert(*end == '\0');
+                strtol(argv[2*(i+1)], &end, 10);
+                if (*end != '\0') {
+                    printf("Erreur\n");
+                    return NULL;
+                }
                 int prime = atoi(argv[2*(i+1)]);
                 if(prime >5 || prime<0){
                     printf("Erreur\n");
@@ -112,8 +128,11 @@ config* parse_argument(int argc,char** argv){
                     return NULL;
                 }
                 deja_vu[4] = true;
-                long x = strtol(argv[2*(i+1)], &end, 10);
-                assert(*end == '\0');
+                strtol(argv[2*(i+1)], &end, 10);
+                if (*end != '\0') {
+                    printf("Erreur\n");
+                    return NULL;
+                }
                 int prime = atoi(argv[2*(i+1)]);
                 if(prime<0){
                     printf("Erreur\n");

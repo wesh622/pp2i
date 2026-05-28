@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include "config.h"
 #include "joueur.h"
@@ -14,11 +15,17 @@ config* configuration(int mode, int nb_joueur, int seed, int ai,int max_turn){
     c->nbr_joueur = nb_joueur;
     Joueur* tab = malloc(sizeof(Joueur)*(nb_joueur+ai));
     assert(tab != NULL);
+    c->tab = tab;
+    char* test_env = getenv("CARCASSONNE_TEST");
     for(int i=0;i<nb_joueur;i++){
-        printf("Entrer les infos du Joueurs %d",i);
         char nom[20];
-        printf("Nom du joueur %d: ", i+1);
-        scanf("%19s", nom);
+        if(test_env && strcmp(test_env, "1") == 0) {
+            snprintf(nom, sizeof(nom), "Test%d", i+1);
+        } else {
+            printf("Entrer les infos du Joueur %d\n", i+1);
+            printf("Nom du joueur %d: ", i+1);
+            scanf("%19s", nom);
+        }
         definirJoueur(&c->tab[i], i+1, nom);
         c->tab[i].actif = 1;
     }
