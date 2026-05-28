@@ -8,10 +8,10 @@ SRC = src/jeu/main.c \
       src/jeu/pioche.c \
       src/jeu/joueur.c \
       src/jeu/score.c \
+      src/jeu/meeple.c \
       src/jeu/affichage.c \
       src/autres/argc.c \
-      src/autres/config.c \
-	  src/jeu/meeple.c
+      src/autres/config.c
 
 OBJ = $(SRC:%.c=exec/%.o)
 
@@ -48,10 +48,9 @@ exec/%.o: %.c
 $(NAME): $(OBJ)
 	$(cc) $(CFLAGS) $(OBJ) -o $(NAME)
 
-
 test: $(TESTOBJ) src/autres/argc.c src/autres/config.c src/jeu/joueur.c src/jeu/meeple.c
-	CARCASSONNE_TEST=1 $(cc) $(CFLAGS) $(TESTSRC) src/autres/argc.c src/autres/config.c src/jeu/joueur.c src/jeu/meeple.c -o $(TEST)	
-	./$(TEST)
+	CARCASSONNE_TEST=1 $(cc) $(CFLAGS) $(TESTSRC) src/autres/argc.c src/autres/config.c src/jeu/joueur.c src/jeu/meeple.c -o $(TEST)
+	CARCASSONNE_TEST=1 ./$(TEST)
 
 test_plateau: $(TESTSRC_PLATEAU)
 	$(cc) $(CFLAGS) $(TESTSRC_PLATEAU) src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/meeple.c src/jeu/score.c -o $(TEST_PLATEAU)
@@ -79,4 +78,3 @@ test_meeple: $(TESTSRC_MEEPLE)
 
 clean:
 	rm -rf exec $(TESTOBJ) $(NAME) $(TEST) $(TEST_PLATEAU) $(TEST_SCORE) $(TEST_PIOCHE) $(TEST_JOUEUR) $(TEST_TUILE) $(TEST_MEEPLE)
-	

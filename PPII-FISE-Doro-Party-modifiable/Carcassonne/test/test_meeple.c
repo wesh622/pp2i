@@ -74,7 +74,7 @@ void test_peut_placer_meeple_coordonnees_valides(void) {
     int centre = TAILLE_MAX / 2;
     
     // Coordonnees valides sur tuile de depart
-    assert(peut_placer_meeple(p, centre, centre, PRAIRIE, 1) == 1);
+    assert(peut_placer_meeple(p, centre, centre, 1) == 1);
     
     free_plateau(p);
     printf("  -> OK\n");
@@ -87,12 +87,12 @@ void test_peut_placer_meeple_hors_limites(void) {
     Plateau* p = init_plateau();
     
     // Coordonnees negatives
-    assert(peut_placer_meeple(p, -1, 5, PRAIRIE, 1) == 0);
-    assert(peut_placer_meeple(p, 5, -1, PRAIRIE, 1) == 0);
+    assert(peut_placer_meeple(p, -1, 5, 1) == 0);
+    assert(peut_placer_meeple(p, 5, -1, 1) == 0);
     
     // Coordonnees trop grandes
-    assert(peut_placer_meeple(p, TAILLE_MAX, 5, PRAIRIE, 1) == 0);
-    assert(peut_placer_meeple(p, 5, TAILLE_MAX, PRAIRIE, 1) == 0);
+    assert(peut_placer_meeple(p, TAILLE_MAX, 5, 1) == 0);
+    assert(peut_placer_meeple(p, 5, TAILLE_MAX, 1) == 0);
     
     free_plateau(p);
     printf("  -> OK\n");
@@ -106,7 +106,7 @@ void test_peut_placer_meeple_case_vide(void) {
     int centre = TAILLE_MAX / 2;
     
     // Case vide adjacente au centre
-    assert(peut_placer_meeple(p, centre + 1, centre, PRAIRIE, 1) == 0);
+    assert(peut_placer_meeple(p, centre + 1, centre, 1) == 0);
     
     free_plateau(p);
     printf("  -> OK\n");
@@ -120,10 +120,10 @@ void test_peut_placer_meeple_emplacement_invalide(void) {
     int centre = TAILLE_MAX / 2;
     
     // Emplacement 0 (invalide)
-    assert(peut_placer_meeple(p, centre, centre, PRAIRIE, 0) == 0);
+    assert(peut_placer_meeple(p, centre, centre, 0) == 0);
     
     // Emplacement 6 (invalide)
-    assert(peut_placer_meeple(p, centre, centre, PRAIRIE, 6) == 0);
+    assert(peut_placer_meeple(p, centre, centre, 6) == 0);
     
     free_plateau(p);
     printf("  -> OK\n");
