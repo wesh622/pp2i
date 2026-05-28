@@ -46,7 +46,7 @@ void test_argc(void){
         char *argv[] = {
         "carcassonne",
         "-m","2",
-        "-p","4",
+        "-p","3",
         "-a","2",
         "-s","123",
         "-t","100"

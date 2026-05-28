@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 #include "joueur.h"
 
 void test_definirJoueur(void) {
-    Joueur* j;
+    Joueur* j = malloc(sizeof(Joueur));
     definirJoueur(j, 1, "Alice");
     assert(j->idjoueur == 1);
     assert(strcmp(j->nom, "Alice") == 0);
@@ -17,16 +18,16 @@ void test_definirJoueur(void) {
 }
 
 void test_definirIA(void) {
-    Joueur* j;
-    definirIA(j, 99);
-    assert(j->idjoueur == 99);
-    assert(strcmp(j->nom, "IA_99") == 0);
+    Joueur* j = malloc(sizeof(Joueur));
+    definirIA(j, 2);
+    assert(j->idjoueur == 2);
+    assert(strcmp(j->nom, "IA_2") == 0);
     assert(j->actif == 1);
     printf("test_definirIA: OK\n");
 }
 
 void test_enleverJoueur(void) {
-    Joueur* j;
+    Joueur* j = malloc(sizeof(Joueur));
     definirJoueur(j, 1, "Bob");
     enleverJoueur(j);
     assert(j->actif == 0);
@@ -36,7 +37,7 @@ void test_enleverJoueur(void) {
 }
 
 void test_ajouterpoints(void) {
-    Joueur* j;
+    Joueur* j = malloc(sizeof(Joueur));
     j->score = 10;
     ajouterpoints(j, 5);
     assert(j->score == 15);
@@ -46,7 +47,7 @@ void test_ajouterpoints(void) {
 }
 
 void test_meeple_logic(void) {
-    Joueur* j;
+    Joueur* j = malloc(sizeof(Joueur));
     definirJoueur(j, 1, "Test");
 
     // Au début, il peut poser (doit retourner l'indice 0)
