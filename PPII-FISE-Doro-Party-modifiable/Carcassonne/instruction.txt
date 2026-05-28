@@ -1,0 +1,13 @@
+Projet jeu Carcassonne
+
+L'ensemble des dossiers parents sont accompagnés d'un fichier txt expliquant le contenu du dossier.
+
+Les membres du projets sont invités:
+
+        -A utiliser des branches pour push
+        -Commenter l'ensemble des modifications qu'ils ont efféctués via les commits et commentaires (on s'autorise l'usage d'ia pour ameliorer nos commits et commentaires et NON LES ECRIRE DE A à Z) 
+        -Prevenir via notre plateforme de communication chaque push
+        -Proposer des ameliorations a la structure si ils en constatent 
+
+
+

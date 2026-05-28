@@ -147,7 +147,7 @@ config* parse_argument(int argc,char** argv){
                 return NULL;
             }
         }
-        if(ai > nb_joueur || nb_joueur + ai > 5){
+        if(ai>nb_joueur){
             printf("Erreur\n");
             return NULL;
         }
