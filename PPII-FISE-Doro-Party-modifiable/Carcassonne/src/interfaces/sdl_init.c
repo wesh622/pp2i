@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 static const char* POLICES[] = {
     "ressources/font.ttf",
@@ -54,16 +55,42 @@ ContexteSDL* init_sdl(void) {
 
     ctx->police        = charger_police(12);
     ctx->police_grande = charger_police(18);
+
+    IMG_Init(IMG_INIT_PNG);
+    memset(ctx->textures_tuiles, 0, sizeof(ctx->textures_tuiles));
+    ctx->texture_meeple = NULL;
+
+    for (int id = 1; id <= 72; id++) {
+        char chemin[64];
+        snprintf(chemin, sizeof(chemin), "assets/tile_%d.png", id);
+        SDL_Surface* surf = IMG_Load(chemin);
+        if (surf) {
+            ctx->textures_tuiles[id] = SDL_CreateTextureFromSurface(ctx->renderer, surf);
+            SDL_FreeSurface(surf);
+        }
+    }
+
+    SDL_Surface* surf_m = IMG_Load("assets/meeple_int.png");
+    if (surf_m) {
+        ctx->texture_meeple = SDL_CreateTextureFromSurface(ctx->renderer, surf_m);
+        SDL_SetTextureBlendMode(ctx->texture_meeple, SDL_BLENDMODE_BLEND);
+        SDL_FreeSurface(surf_m);
+    }
+
     return ctx;
 }
 
 void close_sdl(ContexteSDL* ctx) {
     if (!ctx) return;
+    for (int id = 1; id <= 72; id++)
+        if (ctx->textures_tuiles[id]) SDL_DestroyTexture(ctx->textures_tuiles[id]);
+    if (ctx->texture_meeple) SDL_DestroyTexture(ctx->texture_meeple);
     if (ctx->police)        TTF_CloseFont(ctx->police);
     if (ctx->police_grande) TTF_CloseFont(ctx->police_grande);
     if (ctx->renderer)      SDL_DestroyRenderer(ctx->renderer);
     if (ctx->fenetre)       SDL_DestroyWindow(ctx->fenetre);
     free(ctx);
+    IMG_Quit();
     TTF_Quit();
     SDL_Quit();
 }

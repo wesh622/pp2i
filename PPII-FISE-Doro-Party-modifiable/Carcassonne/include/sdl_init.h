@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 
 #define TAILLE_CASE     60
 #define RAYON_VUE        6
@@ -15,6 +16,8 @@ typedef struct _ContexteSDL {
     SDL_Renderer* renderer;
     TTF_Font*     police;
     TTF_Font*     police_grande;
+    SDL_Texture*  textures_tuiles[73];  /* indices 1..72 */
+    SDL_Texture*  texture_meeple;
 } ContexteSDL;
 
 ContexteSDL* init_sdl(void);

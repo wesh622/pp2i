@@ -76,7 +76,7 @@ void sdl_afficher_panel(ContexteSDL* ctx, Joueur* j, Pioche* pioche,
                   (SDL_Color){160,160,160,255}, PX_PANEL + LARGEUR_PANEL/2, y);
         y += 16;
         int tx = PX_PANEL + LARGEUR_PANEL/2 - TAILLE_CASE/2;
-        sdl_dessiner_tuile(r, ctx->police, *tuile_courante, tx, y, 0);
+        sdl_dessiner_tuile(ctx, *tuile_courante, tx, y, 0);
         y += TAILLE_CASE + 8;
     }
 

@@ -8,11 +8,11 @@
 
 SDL_Color   couleur_sdl_face(int face);
 const char* symbole_face(int face);
-SDL_Color   couleur_joueur(int idx);  // idx 0-indexé (joueur 1 = idx 0)
+SDL_Color   couleur_joueur(int idx);  /* idx 0-indexé (joueur 1 = idx 0) */
 
-void sdl_dessiner_tuile(SDL_Renderer* r, TTF_Font* police,
+void sdl_dessiner_tuile(ContexteSDL* ctx,
                         Tuiles t, int px, int py, int surbrillance);
-void sdl_dessiner_tuile_zoom(SDL_Renderer* r, TTF_Font* police,
+void sdl_dessiner_tuile_zoom(ContexteSDL* ctx,
                              Tuiles t, int zpx, int zpy, int zoom);
 void sdl_dessiner_case_vide(SDL_Renderer* r, int px, int py, int valide);
 void sdl_texte(SDL_Renderer* r, TTF_Font* police,
