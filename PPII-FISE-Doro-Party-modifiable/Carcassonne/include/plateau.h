@@ -1,6 +1,6 @@
 #ifndef PLATEAU_H
 #define PLATEAU_H
-#define TAILLE_MAX 72
+#define TAILLE_MAX 144
 #include "tuiles.h"
 #include "joueur.h"
 #include "pioche.h"
@@ -25,9 +25,11 @@ char face_vers_char(int face);
 int verifier_abbaye_complete(Plateau* p, int x, int y);
 int ville_recursive(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]);
 int route_recursive(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]);
+int prairie_recursive(Plateau* p,int x,int y,int visite[TAILLE_MAX][TAILLE_MAX]);
 int verifie_ville_complete(Plateau* p, int x, int y);
 int verifie_route_complete(Plateau* p, int x, int y);
 void choix_case_IA(Plateau* p, Tuiles tuile, Joueur* joueur, config* conf, int total_joueurs);
+Tuiles* piocher_tuile_jouable(Pioche* pioche, Plateau* plateau);
 
 #endif
 

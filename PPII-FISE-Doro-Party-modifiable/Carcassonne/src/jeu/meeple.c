@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
+// Debut: Mohamed
+
+// Initialisation d'un meeple
 void init_meeple(Meeple* m, int id, int idjoueur){
     assert(m != NULL);
     assert(id >= 1 && id <= 7);
@@ -18,6 +21,7 @@ void init_meeple(Meeple* m, int id, int idjoueur){
     m->posY = -1;
 }
 
+// Placement d'un meeple sur le plateau
 int placer_meeple(Meeple* m, int posX, int posY, int zone, int emplacement){
     if(m->etat != 1){
         return 0;
@@ -32,6 +36,7 @@ int placer_meeple(Meeple* m, int posX, int posY, int zone, int emplacement){
     }
 }
 
+// Vérifie si un meeple peut etre place a la position 
 int peut_placer_meeple(Plateau* plateau, int posX, int posY, int emplacement){
     if(!(posX >= 0 && posX < TAILLE_MAX && posY >= 0 && posY < TAILLE_MAX)){
         return 0;
@@ -47,6 +52,7 @@ int peut_placer_meeple(Plateau* plateau, int posX, int posY, int emplacement){
     }
 }
 
+// retirer un meeple du plateau
 void retirer_meeple(Meeple* m){
     m->etat = 1; 
     m->zone = 0; 
@@ -55,6 +61,7 @@ void retirer_meeple(Meeple* m){
     m->posY = -1;    
 }
 
+// Vérifie si un meeple est disponible pour être placé
 int meeple_disponible(Meeple* m){
     if(m->etat == 1){
         return 1;
@@ -62,6 +69,7 @@ int meeple_disponible(Meeple* m){
     return 0;
 }    
 
+// Vérifie si au moins un meeple du joueur est disponible
 int au_moins_un_meeple_disponible(Joueur* j){
     for (int i=0; i<7 ; i++) {
         if (meeple_disponible(&(j->stock[i])) == 1) {
@@ -71,6 +79,7 @@ int au_moins_un_meeple_disponible(Joueur* j){
     return 0;
 }
 
+// Retourne un pointeur vers le premier meeple disponible du joueur.
 Meeple* premier_meeple_disponible(Joueur* j){
     for (int i=0; i<7 ; i++) {
         if (meeple_disponible(&(j->stock[i])) == 1) {
@@ -80,6 +89,7 @@ Meeple* premier_meeple_disponible(Joueur* j){
     return &(j->stock[0]);
 }
 
+// Affichage d'un meeple (pour debug)
 void afficher_meeple(Meeple* m){
     if(m == NULL){
         return;
@@ -94,10 +104,11 @@ void afficher_meeple(Meeple* m){
            m->emplacement);
 }
 
+// Choix de l'IA pour placer un meeple
 void choix_meeple_IA(Plateau* plateau, Tuiles tuile, Joueur* j, int x, int y) {
         int n = rand();
         if (n % 2 == 0) { // L'IA veut poser un meeple
-            int emplacement = 1;
+            int emplacement = (rand() % 5) + 1;
             int zone = 0;
             for (int i = 1; i<6; i++) {
                 if (emplacement == 1) {
