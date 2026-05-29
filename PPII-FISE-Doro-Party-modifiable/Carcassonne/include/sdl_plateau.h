@@ -5,6 +5,7 @@
 #include "sdl_rendu.h"
 #include "plateau.h"
 #include "tuiles.h"
+#include "joueur.h"
 
 typedef struct _VueSDL {
     int centre_i;
@@ -17,6 +18,7 @@ void grille_vers_pixel(int i, int j, VueSDL vue, int* px, int* py);
 void pixel_vers_grille(int mx, int my, VueSDL vue, int* i, int* j);
 
 void sdl_afficher_plateau(ContexteSDL* ctx, Plateau* p,
-                          Tuiles* tuile_courante, VueSDL vue);
+                          Tuiles* tuile_courante, VueSDL vue,
+                          Joueur* joueurs, int total_joueurs);
 
 #endif

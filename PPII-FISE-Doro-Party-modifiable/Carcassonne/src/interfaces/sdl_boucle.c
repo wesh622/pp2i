@@ -1,5 +1,6 @@
 #include "sdl_boucle.h"
 #include "sdl_init.h"
+#include "sdl_accueil.h"
 #include "sdl_plateau.h"
 #include "sdl_panel.h"
 #include "sdl_input.h"
@@ -15,15 +16,32 @@ static void tout_afficher(ContexteSDL* ctx, Plateau* plateau, Pioche* pioche,
                            int total_joueurs, Joueur* j, VueSDL* vue) {
     SDL_SetRenderDrawColor(ctx->renderer, 12, 12, 18, 255);
     SDL_RenderClear(ctx->renderer);
-    sdl_afficher_plateau(ctx, plateau, tuile, *vue);
+    sdl_afficher_plateau(ctx, plateau, tuile, *vue, conf->tab, total_joueurs);
     sdl_afficher_panel(ctx, j, pioche, tuile, tour, total_joueurs, conf->tab);
     SDL_RenderPresent(ctx->renderer);
+}
+
+// retourne 1 si la tuile peut être posée quelque part dans au moins une orientation
+static int tuile_placable_quelque_part(Plateau* p, Tuiles* t) {
+    for (int rot = 0; rot < 4; rot++) {
+        for (int i = 0; i < TAILLE_MAX; i++) {
+            for (int j = 0; j < TAILLE_MAX; j++) {
+                if (!p->occupes[i][j] && peut_poser_tuile(p, *t, i, j))
+                    return 1;
+            }
+        }
+        tourner_vers_droite(t);  // après 4 tours on revient à l'original
+    }
+    return 0;
 }
 
 void boucle_sdl_principale(Plateau* plateau, Pioche* pioche,
                             config* conf, int total_joueurs) {
     ContexteSDL* ctx = init_sdl();
     if (!ctx) return;
+
+    // écran d'accueil avant le début
+    sdl_afficher_accueil(ctx, conf, total_joueurs);
 
     VueSDL vue = vue_init();
     int quitter = 0;
@@ -32,11 +50,20 @@ void boucle_sdl_principale(Plateau* plateau, Pioche* pioche,
         int joueur_actuel = i % total_joueurs;
         Joueur* j = &conf->tab[joueur_actuel];
 
-        Tuiles* tuile = piocher(pioche);
+        // piocher une tuile placable — écarter les tuiles impossibles
+        Tuiles* tuile = NULL;
+        while (!pioche_vide(pioche)) {
+            tuile = piocher(pioche);
+            if (!tuile) break;
+            if (tuile_placable_quelque_part(plateau, tuile)) break;
+            // tuile non placable : on l'écarte et on continue
+            tuile = NULL;
+        }
         if (!tuile) break;
 
+        SDL_Color col_j = couleur_joueur(j->idjoueur - 1);
+
         if (j->est_IA) {
-            // l'IA joue, on reaffiche et on laisse une petite pause pour que ce soit visible
             choix_case_IA(plateau, *tuile, j, conf, total_joueurs);
             tout_afficher(ctx, plateau, pioche, conf, NULL, i+1, total_joueurs, j, &vue);
             SDL_Delay(700);
@@ -66,9 +93,7 @@ void boucle_sdl_principale(Plateau* plateau, Pioche* pioche,
 
                     if (au_moins_un_meeple_disponible(j)) {
                         tout_afficher(ctx, plateau, pioche, conf, NULL, i+1, total_joueurs, j, &vue);
-                        int px, py;
-                        grille_vers_pixel(i_case, j_case, vue, &px, &py);
-                        int emplacement = sdl_choisir_emplacement_meeple(ctx, *tuile, px, py);
+                        int emplacement = sdl_choisir_emplacement_meeple(ctx, *tuile, col_j);
                         if (emplacement > 0 && peut_placer_meeple(plateau, i_case, j_case, emplacement)) {
                             Meeple* m = premier_meeple_disponible(j);
                             int zone = 0;
@@ -81,7 +106,6 @@ void boucle_sdl_principale(Plateau* plateau, Pioche* pioche,
                         }
                     }
                 }
-                // clic invalide → on reboucle silencieusement
             }
         }
     }

@@ -21,7 +21,8 @@ SRC_SDL_INTERFACES = src/interfaces/sdl_init.c \
                      src/interfaces/sdl_input.c \
                      src/interfaces/sdl_meeple_overlay.c \
                      src/interfaces/sdl_boucle.c \
-                     src/interfaces/sdl_fin.c
+                     src/interfaces/sdl_fin.c \
+                     src/interfaces/sdl_accueil.c
 
 OBJ = $(SRC:%.c=exec/%.o)
 

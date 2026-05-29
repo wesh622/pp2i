@@ -43,7 +43,7 @@ void sdl_afficher_panel(ContexteSDL* ctx, Joueur* j, Pioche* pioche,
 
     snprintf(buf, sizeof(buf), "%s%s", j->nom, j->est_IA ? " (IA)" : "");
     sdl_texte(r, ctx->police_grande, buf,
-              (SDL_Color){180,255,180,255}, PX_PANEL + LARGEUR_PANEL/2, y);
+              couleur_joueur(j->idjoueur - 1), PX_PANEL + LARGEUR_PANEL/2, y);
     y += 30;
 
     sdl_texte(r, ctx->police, "--- Scores ---",
@@ -52,8 +52,8 @@ void sdl_afficher_panel(ContexteSDL* ctx, Joueur* j, Pioche* pioche,
     for (int k = 0; k < total_joueurs; k++) {
         if (!tous_joueurs[k].actif) continue;
         SDL_Color col = (&tous_joueurs[k] == j)
-            ? (SDL_Color){255,220,60,255}
-            : (SDL_Color){200,200,200,255};
+            ? couleur_joueur(tous_joueurs[k].idjoueur - 1)
+            : (SDL_Color){160,160,160,255};
         snprintf(buf, sizeof(buf), "%-12s %4d pts", tous_joueurs[k].nom, tous_joueurs[k].score);
         sdl_texte(r, ctx->police, buf, col, PX_PANEL + LARGEUR_PANEL/2, y);
         y += 16;
