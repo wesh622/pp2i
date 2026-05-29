@@ -6,8 +6,14 @@
 #include "tuiles.h"
 #include "joueur.h"
 
+// ============================================================================
+// Tests unitaires pour le module plateau (grille, placement, compatibilité)
+// ============================================================================
 
-
+/**
+ * Vérifie l'initialisation du plateau : la case centrale est marquée occupée,
+ * les autres sont libres.
+ */
 void test_init_plateau(void) {
     printf("Test init_plateau...\n");
     
@@ -23,44 +29,47 @@ void test_init_plateau(void) {
     printf("  -> OK\n");
 }
 
+/**
+ * Teste la fonction peut_poser_tuile().
+ * Vérifie les limites, l'occupation, la compatibilité avec les voisins.
+ */
 void test_peut_poser_tuile(void) {
     printf("Test peut_poser_tuile...\n");
     
     Plateau *p = init_plateau();
     int centre = TAILLE_MAX / 2;
 
-    // Case déjà occupée
+    // Case déjà occupée (centre)
     assert(peut_poser_tuile(p, tuiles_jeu[1], centre, centre) == 0);
 
-    // depasse limite
+    // Hors limites
     assert(peut_poser_tuile(p, tuiles_jeu[1], -1, 0) == 0);
     assert(peut_poser_tuile(p, tuiles_jeu[1], TAILLE_MAX, 0) == 0);
 
-    // Case éloignée sans voisin
+    // Case éloignée sans aucun voisin
     assert(peut_poser_tuile(p, tuiles_jeu[1], centre+2, centre) == 0);
 
-    // Case adjacente à la tuile de départ (compatibilité OK)
+    // Cases adjacentes compatibles (tuile 2, 12, 6 par rapport à la tuile départ)
     assert(peut_poser_tuile(p, tuiles_jeu[2], centre+1, centre) == 1);
     assert(peut_poser_tuile(p, tuiles_jeu[12], centre, centre-1) == 1);
     assert(peut_poser_tuile(p, tuiles_jeu[2], centre, centre+1) == 1);
     assert(peut_poser_tuile(p, tuiles_jeu[6], centre-1, centre) == 1);
 
-    // Vérification 4 : incompatibilité avec la tuile adjacente
-    // On place une tuile à droite du centre
+    // Test d'incompatibilité : on place une tuile à droite du centre,
+    // puis on essaie de poser une tuile incompatible à gauche.
     int x = centre + 1;
     int y = centre;
-    poser_tuile(p, tuiles_jeu[1], x, y); // tuiles_jeu[1] a des faces différentes de tuiles_jeu[0]
-    // On tente de poser une tuile incompatible à gauche de celle-ci (centre, centre)
-    // On modifie une tuile pour forcer l'incompatibilité
+    poser_tuile(p, tuiles_jeu[1], x, y); // tuiles_jeu[1] a des faces spécifiques
+    // On modifie artificiellement une tuile pour la rendre incompatible
     Tuiles incompatible = tuiles_jeu[2];
-    incompatible.b = 99; // valeur qui ne correspondra à aucune face valide
+    incompatible.b = 99; // valeur qui ne correspond à aucune face valide
     assert(peut_poser_tuile(p, incompatible, centre, centre) == 0);
 
-    // On tente de poser une tuile compatible à gauche de celle-ci (centre, centre)
+    // Tuile compatible mais case occupée
     Tuiles compatible = tuiles_jeu[1];
-    assert(peut_poser_tuile(p, compatible, centre, centre) == 0); // déjà occupée
+    assert(peut_poser_tuile(p, compatible, centre, centre) == 0);
 
-    // On libère la case centrale pour tester la compatibilité
+    // On libère la case centrale pour tester une vraie compatibilité
     p->occupes[centre][centre] = 0;
     assert(peut_poser_tuile(p, compatible, centre, centre) == 1);
 
@@ -68,6 +77,10 @@ void test_peut_poser_tuile(void) {
     printf("  -> OK\n");
 }
 
+/**
+ * Teste poser_tuile() : vérifie que la case devient occupée et que la tuile
+ * est bien stockée dans la grille.
+ */
 void test_poser_tuile(void) {
     printf("Test poser_tuile...\n");
     
@@ -76,7 +89,6 @@ void test_poser_tuile(void) {
     int x = centre + 1;
     int y = centre;
     
-    // On utilise la deuxième tuile du tableau global (indice 1)
     Tuiles t = tuiles_jeu[1];
     assert(p->occupes[x][y] == 0);
     
@@ -88,15 +100,20 @@ void test_poser_tuile(void) {
     printf("  -> OK\n");
 }
 
+/**
+ * Teste l'affichage du plateau (vérification visuelle, pas de crash).
+ */
 void test_afficher_plateau(void) {
     printf("Test afficher_plateau...\n");
-    // Rien à vérifier automatiquement, on regarde juste que ça ne crash pas
     Plateau *p = init_plateau();
     afficher_plateau(p);
     free_plateau(p);
-    printf("  -> OK (vérification visuelle)\n");
+    printf("  -> OK (verification visuelle)\n");
 }
 
+/**
+ * Teste l'affichage d'un tour (joueur, score, stock).
+ */
 void test_afficher_tour(void) {
     printf("Test afficher_tour...\n");
     Joueur j;
@@ -110,16 +127,22 @@ void test_afficher_tour(void) {
         j.stock[i].idjoueur = 1;
     }
     afficher_tour(3, &j);
-    printf("  -> OK (vérification visuelle)\n");
+    printf("  -> OK (verification visuelle)\n");
 }
 
+/**
+ * Teste l'affichage d'une tuile (détails des faces).
+ */
 void test_afficher_tuile(void) {
     printf("Test afficher_tuile...\n");
     Tuiles t = tuiles_jeu[0];
     afficher_tuile(t);
-    printf("  -> OK (vérification visuelle)\n");
+    printf("  -> OK (verification visuelle)\n");
 }
 
+/**
+ * Teste la détection d'une abbaye complète (entourée de 8 tuiles).
+ */
 void test_verifier_abbaye_complete(void) {
     printf("Test verifier_abbaye_complete...\n");
     Plateau* p = init_plateau();
@@ -136,9 +159,10 @@ void test_verifier_abbaye_complete(void) {
         printf("[FAIL] L'abbaye ne devrait pas être complète.\n");
     }
 
-    // Cas 2 : On remplit les 8 cases autour
+    // Cas 2 : On remplit les 8 cases autour (voisins immédiats)
     for (int i = centre - 1; i <= centre + 1; i++) {
         for (int j = centre - 1; j <= centre + 1; j++) {
+            if (i == centre && j == centre) continue;
             p->occupes[i][j] = 1;
         }
     }
@@ -152,14 +176,17 @@ void test_verifier_abbaye_complete(void) {
     free_plateau(p);
 }
 
+/**
+ * Teste la détection d'une ville complète (tous les bords de la zone sont fermés).
+ * On construit manuellement une petite ville de deux tuiles face à face.
+ */
 void test_verifie_ville_complete(void) {
     printf("Test verifie_ville_complete...\n");
     Plateau* p = init_plateau();
     int cx = TAILLE_MAX / 2;
     int cy = TAILLE_MAX / 2;
 
-    // Création d'une petite ville de 2 tuiles face à face
-    // Tuile A : Ville à l'Est, le reste en Prairie
+    // Tuile A : Ville à l'Est, les autres côtés Prairie
     p->grille[cx][cy] = (Tuiles){.a=PRAIRIE, .b=VILLE, .c=PRAIRIE, .d=PRAIRIE};
     p->occupes[cx][cy] = 1;
 
@@ -174,7 +201,7 @@ void test_verifie_ville_complete(void) {
     p->grille[cx+1][cy] = (Tuiles){.a=PRAIRIE, .b=PRAIRIE, .c=PRAIRIE, .d=VILLE};
     p->occupes[cx+1][cy] = 1;
 
-    // Cas 2 : Ville fermée (A.Est touche B.Ouest, les autres côtés sont Prairie)
+    // Cas 2 : Ville fermée (A.Est touche B.Ouest, autres côtés Prairie)
     if (verifie_ville_complete(p, cx, cy) == 1) {
         printf("  -> OK\n");
     } else {
@@ -184,13 +211,17 @@ void test_verifie_ville_complete(void) {
     free_plateau(p);
 }
 
+/**
+ * Teste la détection d'une route complète (de carrefour à carrefour ou boucle).
+ * On construit une ligne de tuiles routes entre deux carrefours.
+ */
 void test_verifie_route_complete(void) {
     printf("Test verifie_route_complete...\n");
     Plateau* p = init_plateau();
     int cx = TAILLE_MAX / 2;
     int cy = TAILLE_MAX / 2;
 
-    // Tuile 1 : Carrefour (bouchon) avec route vers l'Est
+    // Tuile 1 : Carrefour avec route vers l'Est
     p->grille[cx][cy] = (Tuiles){.center=CARREFOUR, .b=ROUTE_PRAIRIE};
     p->occupes[cx][cy] = 1;
 
@@ -198,14 +229,14 @@ void test_verifie_route_complete(void) {
     p->grille[cx+1][cy] = (Tuiles){.center=PRAIRIE, .d=ROUTE_PRAIRIE, .b=ROUTE_PRAIRIE};
     p->occupes[cx+1][cy] = 1;
 
-    // Cas 1 : Route ouverte à l'Est de la Tuile 2
+    // Cas 1 : Route ouverte à l'Est de la Tuile 2 (pas de troisième tuile)
     if (verifie_route_complete(p, cx, cy) == 0) {
         printf("  -> OK\n");
     } else {
         printf("[FAIL] La route est ouverte.\n");
     }
 
-    // Tuile 3 : Carrefour (bouchon) avec route vers l'Ouest
+    // Tuile 3 : Carrefour avec route vers l'Ouest (ferme la route)
     p->grille[cx+2][cy] = (Tuiles){.center=CARREFOUR, .d=ROUTE_PRAIRIE};
     p->occupes[cx+2][cy] = 1;
 

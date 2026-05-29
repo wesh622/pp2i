@@ -7,26 +7,35 @@
 #include "pioche.h"
 #include "config.h"
 
-/* =========================================================
- *  UTILITAIRES INTERNES
- * ========================================================= */
 
-/* Retourne la couleur ANSI correspondant à un type de face */
+// Couleurs des joueurs (fonds colorés pour les meeples) 
+static const char* couleur_fond_joueur(int idjoueur) {
+    switch (idjoueur) {
+        case 1: return "\033[41m";   /* rouge     – joueur 1 */
+        case 2: return "\033[42m";   /* vert      – joueur 2 */
+        case 3: return "\033[44m";   /* bleu      – joueur 3 */
+        case 4: return "\033[43m";   /* jaune     – joueur 4 */
+        case 5: return "\033[45m";   /* jaune     – joueur 4 */
+        default: return "\033[0m";
+    }
+}
+
+// Retourne la couleur ANSI correspondant à un type de face 
 static const char* couleur_face(int face) {
     switch (face) {
-        case ROUTE_PRAIRIE: return "\033[33m";   /* jaune  – route */
-        case PRAIRIE:       return "\033[32m";   /* vert   – prairie */
-        case VILLE:         return "\033[34m";   /* bleu   – ville */
-        case VILLE_BOUCLIER:return "\033[36m";   /* cyan   – ville+bouclier */
-        case ABBAYE:        return "\033[35m";   /* violet – abbaye */
-        case CARREFOUR:     return "\033[31m";   /* rouge  – carrefour */
+        case ROUTE_PRAIRIE: return "\033[33m";   // jaune  – route 
+        case PRAIRIE:       return "\033[32m";   // vert   – prairie 
+        case VILLE:         return "\033[34m";   // bleu   – ville 
+        case VILLE_BOUCLIER:return "\033[36m";   // cyan   – ville+bouclier 
+        case ABBAYE:        return "\033[35m";   // violet – abbaye 
+        case CARREFOUR:     return "\033[31m";   // rouge  – carrefour 
         default:            return "\033[0m";
     }
 }
 
-#define RESET "\033[0m"
+#define RESET " \033[0m"
 
-/* Retourne le symbole (3 cars) d'une face, centré */
+// Retourne le symbole (3 cars) d'une face, centré 
 static const char* sym_face(int face) {
     switch (face) {
         case ROUTE_PRAIRIE: return "RTE";
@@ -39,11 +48,10 @@ static const char* sym_face(int face) {
     }
 }
 
-/* Retourne le caractère unique (pour l'affichage compact du plateau) */
 static char lettre_face(int face) {
     switch (face) {
         case ROUTE_PRAIRIE: return 'r';
-        case PRAIRIE:       return '.';
+        case PRAIRIE:       return 'p';
         case VILLE:         return 'V';
         case VILLE_BOUCLIER:return 'W';
         case ABBAYE:        return 'A';
@@ -51,6 +59,22 @@ static char lettre_face(int face) {
         default:            return '?';
     }
 }
+
+// Retourne la couleur de fond d'un meeple si présent à la position et emplacement donnés, sinon retourne NULL. Les joueurs sont passés en paramètre pour parcourir leurs meeples 
+static const char* find_meeple_color(Joueur joueurs[], int nb_joueurs, int posX, int posY, int emplacement) {
+    for (int i = 0; i < nb_joueurs; i++) {
+        if (joueurs[i].actif == 0) continue;
+        
+        for (int m = 0; m < 7; m++) {
+            Meeple mep = joueurs[i].stock[m];
+            if (mep.etat == 0 && mep.posX == posX && mep.posY == posY && mep.emplacement == emplacement) {
+                return couleur_fond_joueur(mep.idjoueur);
+            }
+        }
+    }
+    return NULL;
+}
+
 
 void afficher_plateau_cli(Plateau *p) {
     printf("\n=== PLATEAU ===\n");
@@ -67,27 +91,7 @@ void afficher_plateau_cli(Plateau *p) {
     printf("===============\n\n");
 }
 
-/* =========================================================
- *  AFFICHAGE D'UNE TUILE (vue détaillée 5 lignes)
- *
- *  Exemple :
- *   ┌────────────┐
- *   │    [RTE]   │
- *   │ [PRR][VIL] │   ← Ouest / Centre / Est
- *   │    [VIL]   │
- *   └── id:07 ───┘
- * =========================================================
- *  AFFICHAGE D'UNE TUILE COMPACT (1 cellule dans le plateau)
- *  Format : N/E/S/O dans 4 coins + centre
- *
- *  ╔═══╗
- *  ║.V.║   Nord=Prairie  Est=Ville  Sud=Prairie
- *  ║rVr║   Ouest=Route   Centre=Ville
- *  ║.V.║
- *  ╚═══╝
- * ========================================================= */
-
-/* Affichage compact d'une tuile seule (3 lignes, utile pour la tuile piochée) */
+//Affichage compact d'une tuile seule (3 lignes, utile pour la tuile piochée) 
 void afficher_tuile_compacte(Tuiles t) {
     char n = lettre_face(t.a);
     char e = lettre_face(t.b);
@@ -102,44 +106,92 @@ void afficher_tuile_compacte(Tuiles t) {
     const char* cC = couleur_face(t.center);
 
     printf("      %s%c%s\n", cN, n, RESET);
-    printf("    %s%c%s %s%c%s %s%c%s\n", cO,o,RESET, cC,c,RESET, cE,e,RESET);
+    printf("    %s%c%s%s%c%s%s%c%s\n", cO,o,RESET, cC,c,RESET, cE,e,RESET);
     printf("      %s%c%s\n", cS, s, RESET);
     printf("    id: %d\n", t.id);
 }
 
-/* =========================================================
- *  AFFICHAGE DU PLATEAU (CLI)
- *  Chaque case occupée est représentée par ses 4 faces + centre
- *  Les cases vides sont grises
- *  Les cases où on PEUT poser sont vertes
- * ========================================================= */
-/* Version améliorée avec couleurs et format compact */
-void afficher_plateau_cli_ameliore(Plateau *p) {
+//  AFFICHAGE DU PLATEAU (CLI)
+void afficher_plateau_cli_ameliore(Plateau *p, Joueur joueurs[], int nb_joueurs) {
     int centre = TAILLE_MAX / 2;
     int rayon  = 5;
 
     printf("\n\033[1m=== PLATEAU ===\033[0m\n");
 
     /* En-tête colonnes */
-    printf("     ");
+    printf("    ");
     for (int j = centre - rayon; j <= centre + rayon; j++) {
-        printf(" %3d ", j);
+        printf(" %3d   ", j);
     }
     printf("\n");
 
+
     for (int i = centre - rayon; i <= centre + rayon; i++) {
-        /* Ligne de la rangée */
-        printf("%3d  ", i);
+        // Affichage sur 3 sous-lignes : nord, centre, sud
+        // Ligne 1 : Nord
+        printf("    ");
         for (int j = centre - rayon; j <= centre + rayon; j++) {
             if (p->occupes[i][j]) {
                 Tuiles t = p->grille[i][j];
-                /* Cellule compacte : Nord/Est/Sud/Ouest/Centre en 1 char coloré */
-                printf(" %s%c%s%s%c%s%s%c%s ",
-                    couleur_face(t.a), lettre_face(t.a), RESET,
-                    couleur_face(t.center), lettre_face(t.center), RESET,
-                    couleur_face(t.c), lettre_face(t.c), RESET);
+                const char* meeple_color = find_meeple_color(joueurs, nb_joueurs, i, j, 1);
+                if (meeple_color) {
+                    printf("  %s%s%c\033[0m%s  ", meeple_color, couleur_face(t.a), lettre_face(t.a), RESET);
+                } else {
+                    printf("  %s%c%s  ", couleur_face(t.a), lettre_face(t.a), RESET);
+                }
+                printf(" ");
             } else {
-                printf("\033[90m  ·  \033[0m");  /* gris – vide */
+                printf("       ");
+            }
+        }
+        printf("\n");
+        // Ligne 2 : Ouest Centre Est
+        printf("%3d ", i);
+        for (int j = centre - rayon; j <= centre + rayon; j++) {
+            if (p->occupes[i][j]) {
+                Tuiles t = p->grille[i][j];
+                
+                const char* meeple_color_o = find_meeple_color(joueurs, nb_joueurs, i, j, 4);
+                const char* meeple_color_c = find_meeple_color(joueurs, nb_joueurs, i, j, 5);
+                const char* meeple_color_e = find_meeple_color(joueurs, nb_joueurs, i, j, 2);
+                
+                if (meeple_color_o) {
+                    printf("%s%s%c\033[0m%s", meeple_color_o, couleur_face(t.d), lettre_face(t.d), RESET);
+                } else {
+                    printf("%s%c%s", couleur_face(t.d), lettre_face(t.d), RESET);
+                }
+                
+                if (meeple_color_c) {
+                    printf("%s%s%c\033[0m%s", meeple_color_c, couleur_face(t.center), lettre_face(t.center), RESET);
+                } else {
+                    printf("%s%c%s", couleur_face(t.center), lettre_face(t.center), RESET);
+                }
+                
+                if (meeple_color_e) {
+                    printf("%s%s%c\033[0m%s", meeple_color_e, couleur_face(t.b), lettre_face(t.b), RESET);
+                } else {
+                    printf("%s%c%s", couleur_face(t.b), lettre_face(t.b), RESET);
+                }
+                printf(" ");
+            } else {
+                printf("\033[90m  ·  \033[0m");
+                printf("  ");
+            }
+        }
+        printf("\n    ");
+        // Ligne 3 : Sud
+        for (int j = centre - rayon; j <= centre + rayon; j++) {
+            if (p->occupes[i][j]) {
+                Tuiles t = p->grille[i][j];
+                const char* meeple_color = find_meeple_color(joueurs, nb_joueurs, i, j, 3);
+                if (meeple_color) {
+                    printf("  %s%s%c\033[0m%s  ", meeple_color, couleur_face(t.c), lettre_face(t.c), RESET);
+                } else {
+                    printf("  %s%c%s  ", couleur_face(t.c), lettre_face(t.c), RESET);
+                }
+                printf(" ");
+            } else {
+                printf("       ");
             }
         }
         printf("\n");
@@ -148,12 +200,17 @@ void afficher_plateau_cli_ameliore(Plateau *p) {
 
     /* Légende */
     printf("Légende : "
-           "%s.%s=Prairie  "
+           "%sp%s=Prairie  "
            "%sr%s=Route  "
            "%sV%s=Ville  "
            "%sW%s=VilleBouclier  "
            "%sA%s=Abbaye  "
-           "%sX%s=Carrefour\n\n",
+           "%sX%s=Carrefour  \n"
+           "\033[41m \033[0m=Joueur1(Rouge)  "
+           "\033[42m \033[0m=Joueur2(Vert)  "
+           "\033[44m \033[0m=Joueur3(Bleu)  "
+           "\033[43m \033[0m=Joueur4(Jaune)  "
+           "\033[45m \033[0m=Joueur5(Violet))\n\n",
         couleur_face(PRAIRIE),       RESET,
         couleur_face(ROUTE_PRAIRIE), RESET,
         couleur_face(VILLE),         RESET,
@@ -162,9 +219,125 @@ void afficher_plateau_cli_ameliore(Plateau *p) {
         couleur_face(CARREFOUR),     RESET);
 }
 
-/* =========================================================
- *  AFFICHAGE DU TOUR AVEC COULEUR
- * ========================================================= */
+void afficher_plateau_cli_ameliore_pour_placer_tuile(Plateau *p, Tuiles *tuile_param, Joueur joueurs[], int nb_joueurs) {
+    int centre = TAILLE_MAX / 2;
+    int rayon  = 5;
+    printf("\n\033[1m=== PLATEAU ===\033[0m\n");
+
+    
+    printf("    ");
+    for (int j = centre - rayon; j <= centre + rayon; j++) {
+        printf(" %3d   ", j);
+    }
+    printf("\n");
+
+
+    for (int i = centre - rayon; i <= centre + rayon; i++) {
+        printf("    ");
+        for (int j = centre - rayon; j <= centre + rayon; j++) {
+            if (p->occupes[i][j]) {
+                Tuiles t = p->grille[i][j];
+                const char* meeple_color = find_meeple_color(joueurs, nb_joueurs, i, j, 1);
+                if (meeple_color) {
+                    printf("  ");
+                    printf("%s%c\033[0m  ", meeple_color, lettre_face(t.a));
+                    printf(" ");
+                } else {
+                    printf("  %s%c%s  ", couleur_face(t.a), lettre_face(t.a), RESET);
+                }
+                printf(" ");
+            } else {
+                printf("       ");
+            }
+        }
+        printf("\n");
+        printf("%3d ", i);
+        for (int j = centre - rayon; j <= centre + rayon; j++) {
+            if (p->occupes[i][j]) {
+                Tuiles t = p->grille[i][j];
+                
+                const char* meeple_color_o = find_meeple_color(joueurs, nb_joueurs, i, j, 4);
+                const char* meeple_color_c = find_meeple_color(joueurs, nb_joueurs, i, j, 5);
+                const char* meeple_color_e = find_meeple_color(joueurs, nb_joueurs, i, j, 2);
+                
+                if (meeple_color_o) {
+                    printf("%s%c\033[0m", meeple_color_o, lettre_face(t.d));
+                    printf(" ");
+                } else {
+                    printf("%s%c%s", couleur_face(t.d), lettre_face(t.d), RESET);
+                }
+                
+                if (meeple_color_c) {
+                    printf("%s%c\033[0m", meeple_color_c, lettre_face(t.center));
+                    printf(" ");
+                } else {
+                    printf("%s%c%s", couleur_face(t.center), lettre_face(t.center), RESET);
+                }
+                
+                if (meeple_color_e) {
+                    printf("%s%c\033[0m", meeple_color_e, lettre_face(t.b));
+                    printf(" ");
+                } else {
+                    printf("%s%c%s", couleur_face(t.b), lettre_face(t.b), RESET);
+                }
+                printf(" ");
+            } else {
+                if (peut_poser_tuile_silent(p, tuile_param, i, j) == 1) {
+                    printf("\033[32m  ·  \033[0m");
+                    printf("  ");
+
+                } else {
+                    printf("\033[31m  ·  \033[0m");
+                    printf("  ");
+                }
+            }
+        }
+        printf("\n    ");
+
+        for (int j = centre - rayon; j <= centre + rayon; j++) {
+            if (p->occupes[i][j]) {
+                Tuiles t = p->grille[i][j];
+                const char* meeple_color = find_meeple_color(joueurs, nb_joueurs, i, j, 3);
+                if (meeple_color) {
+                    printf("  ");
+                    printf("%s%c\033[0m  ", meeple_color, lettre_face(t.c));
+                    printf(" ");
+                } else {
+                    printf("  %s%c%s  ", couleur_face(t.c), lettre_face(t.c), RESET);
+                }
+                printf(" ");
+            } else {
+                printf("       ");
+            }
+        }
+        printf("\n");
+    }
+    printf("\n");
+
+    // Légende
+    printf("Légende : "
+            "\033[32m·\033[0m=Peut placer  "
+           "\033[31m·\033[0m=Impossible  "
+           "%sp%s=Prairie  "
+           "%sr%s=Route  "
+           "%sV%s=Ville  "
+           "%sW%s=VilleBouclier  "
+           "%sA%s=Abbaye  "
+           "%sX%s=Carrefour  \n"
+           "\033[41m \033[0m=Joueur1(Rouge)  "
+           "\033[42m \033[0m=Joueur2(Vert)  "
+           "\033[44m \033[0m=Joueur3(Bleu)  "
+           "\033[43m \033[0m=Joueur4(Jaune)  "
+           "\033[45m \033[0m=Joueur5(Violet))\n\n",
+        couleur_face(PRAIRIE),       RESET,
+        couleur_face(ROUTE_PRAIRIE), RESET,
+        couleur_face(VILLE),         RESET,
+        couleur_face(VILLE_BOUCLIER),RESET,
+        couleur_face(ABBAYE),        RESET,
+        couleur_face(CARREFOUR),     RESET);
+}
+
+// affichage couleur
 void afficher_tour_ameliore(int numero_tour, Joueur *j) {
     printf("\n\033[1;33m╔══════════════════════════════╗\033[0m\n");
     printf("\033[1;33m║      TOUR %-3d                 ║\033[0m\n", numero_tour);
@@ -188,9 +361,7 @@ void afficher_tour_ameliore(int numero_tour, Joueur *j) {
     printf("\033[1;33m╚══════════════════════════════╝\033[0m\n\n");
 }
 
-/* =========================================================
- *  AFFICHAGE DE LA CONFIGURATION
- * ========================================================= */
+// affichage 2
 void afficher_config(config *conf, int nb_joueurs_total) {
     printf("\n\033[1m╔══════════════════════════════════╗\033[0m\n");
     printf("\033[1m║         CONFIGURATION            ║\033[0m\n");
@@ -216,13 +387,11 @@ void afficher_config(config *conf, int nb_joueurs_total) {
     printf("\033[1m╚══════════════════════════════════╝\033[0m\n\n");
 }
 
-/* =========================================================
- *  AFFICHAGE DU NOMBRE DE TUILES RESTANTES
- * ========================================================= */
+//afficher tuile restantes dans la pioche
 void afficher_pioche(Pioche *pioche) {
     int restantes = pioche->nbresrestantes;
     int total = 71;
-    int ratio  = (restantes * 20) / total;  /* barre sur 20 chars */
+    int ratio  = (restantes * 20) / total; 
 
     printf("\n\033[1m┌─ PIOCHE ──────────────────────┐\033[0m\n");
     printf("\033[1m│\033[0m  [");
@@ -236,10 +405,7 @@ void afficher_pioche(Pioche *pioche) {
     printf("\033[1m└───────────────────────────────┘\033[0m\n\n");
 }
 
-/* =========================================================
- *  MENU D'OPTIONS EN COURS DE JEU
- *  Retourne le choix du joueur
- * ========================================================= */
+// menu et options au fur et à mesure du jeu
 int afficher_menu_options(void) {
     printf("\n\033[1m── Options ─────────────────────────────────\033[0m\n");
     printf("  \033[33m[1]\033[0m Poser la tuile\n");
@@ -258,14 +424,10 @@ int afficher_menu_options(void) {
     return choix;
 }
 
-/* =========================================================
- *  AFFICHAGE DE LA TUILE PIOCHÉE (avec détails)
- * ========================================================= */
+// affichage de la tuile pioché 
 void afficher_tuile_piochee(Tuiles t) {
     printf("\n\033[1m┌─ TUILE PIOCHÉE ───────────────────────┐\033[0m\n");
     printf("\033[1m│\033[0m\n");
-
-    /* Rendu ASCII complet */
     printf("\033[1m│\033[0m       Nord: %s%-3s%s\n",
            couleur_face(t.a), sym_face(t.a), RESET);
     printf("\033[1m│\033[0m  %-3s  [%s%-3s%s]  %-3s\n",
@@ -280,9 +442,7 @@ void afficher_tuile_piochee(Tuiles t) {
     printf("\033[1m└───────────────────────────────────────┘\033[0m\n\n");
 }
 
-/* =========================================================
- *  AFFICHAGE DU RÉSULTAT FINAL
- * ========================================================= */
+// affichage de fin de partie et scores finaux
 void afficher_fin_de_partie(Joueur joueurs[], int nb_joueurs) {
     printf("\n\033[1;33m");
     printf("╔══════════════════════════════════╗\n");
@@ -302,7 +462,7 @@ void afficher_fin_de_partie(Joueur joueurs[], int nb_joueurs) {
     for (int i = 0; i < nb_joueurs; i++) {
         if (!joueurs[i].actif) continue;
         if (i == gagnant)
-            printf("\033[1;32m║   %-14s  %4d pts ║\033[0m\n",
+            printf("\033[1;32m║    %-14s  %4d pts ║\033[0m\n",
                    joueurs[i].nom, joueurs[i].score);
         else
             printf("║    %-14s  %4d pts ║\n",

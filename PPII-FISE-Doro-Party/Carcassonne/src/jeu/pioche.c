@@ -4,6 +4,9 @@
 #include "pioche.h"
 #include "tuiles.h"
 
+// Debut: Moran
+
+// Initialisation de la pioche
 Pioche* init_pioche(int seed){
     Pioche* p = malloc(sizeof(Pioche));
     assert(p != NULL);
@@ -30,6 +33,7 @@ Pioche* init_pioche(int seed){
     return p;
 }
 
+// Piocher une tuile de la pioche
 Tuiles* piocher(Pioche* p){
     if(p->nbresrestantes == 0){
         printf("Pioche vide\n");
@@ -45,6 +49,7 @@ Tuiles* piocher(Pioche* p){
     return tuile;
 }
 
+// Vérifie si la pioche est vide
 int pioche_vide(Pioche* p){
     if(p->nbresrestantes == 0){
         return 1;
@@ -52,8 +57,10 @@ int pioche_vide(Pioche* p){
     return 0;
 }
 
+// Libération de la mémoire de la pioche
 void free_pioche(Pioche* p){
     if(p){
         free(p);
     }
 }
+

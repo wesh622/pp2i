@@ -3,6 +3,17 @@
 #include "joueur.h"
 #include "tuiles.h"
 #include "plateau.h"
+#include "meeple.h"
+
+#define MAX_VISITE 144
+
+
+static int ville_deja_comptee(int villes[],int id) {
+    for (int i = 0; i < 72; i++)
+        if (villes[i] == id)
+            return 1;
+    return 0;
+}
 
 //initialisation du score 
 void init_scores(Joueur joueurs[], int nb_joueurs) {
@@ -42,6 +53,7 @@ int joueur_gagnant(Joueur joueurs[], int nb_joueurs) {
     return index;
 }
 
+// compte les points d'une ville en utilisant une approche récursive
 int compter_points_ville(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]) {
     if (x < 0 || x >= TAILLE_MAX || y < 0 || y >= TAILLE_MAX || p->occupes[x][y] == 0 || visite[x][y]) {
         return 0;
@@ -58,24 +70,25 @@ int compter_points_ville(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE
 
     // On explore les 4 directions
     if (t.a == VILLE || t.a == VILLE_BOUCLIER) {
-        pts += compter_points_ville(p, x, y + 1, visite);
+        pts += compter_points_ville(p, x-1, y, visite);
     } 
 
     if (t.b == VILLE || t.b == VILLE_BOUCLIER) {
-        pts += compter_points_ville(p, x + 1, y, visite);
+        pts += compter_points_ville(p, x, y+1, visite);
     } 
 
     if (t.c == VILLE || t.c == VILLE_BOUCLIER) {
-        pts += compter_points_ville(p, x, y - 1, visite);
+        pts += compter_points_ville(p, x+1, y, visite);
     }
 
     if (t.d == VILLE || t.d == VILLE_BOUCLIER) {
-        pts += compter_points_ville(p, x - 1, y, visite);
+        pts += compter_points_ville(p, x, y-1, visite);
     } 
 
     return pts;
 }
 
+// compte les points d'une route en utilisant une approche récursive
 int compter_points_route(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]) {
     if (x < 0 || x >= TAILLE_MAX || y < 0 || y >= TAILLE_MAX || p->occupes[x][y] == 0) {
         return 0;
@@ -89,21 +102,22 @@ int compter_points_route(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE
     int pts = 1; // 1 point par tuile route
 
     if (t.a == ROUTE_PRAIRIE) {
-        pts += compter_points_route(p, x, y + 1, visite);
+        pts += compter_points_route(p, x-1, y, visite);
     } 
     if (t.b == ROUTE_PRAIRIE) {
-        pts += compter_points_route(p, x + 1, y, visite);
+        pts += compter_points_route(p, x, y+1, visite);
     } 
     if (t.c == ROUTE_PRAIRIE) {
-        pts += compter_points_route(p, x, y - 1, visite);
+        pts += compter_points_route(p, x+1, y, visite);
     } 
     if (t.d == ROUTE_PRAIRIE) {
-        pts += compter_points_route(p, x - 1, y, visite);
+        pts += compter_points_route(p, x, y-1, visite);
     } 
 
     return pts;
 }
 
+// Attribue les points à tous les joueurs  
 void attribuer_points_et_recuperer_meeples(int visite[TAILLE_MAX][TAILLE_MAX], int points, Joueur joueurs[], int nb_joueurs) {
     int meeples_par_joueur[NB_JOUEURS_MAX] = { 0 };
     
@@ -159,6 +173,7 @@ void attribuer_points_et_recuperer_meeples(int visite[TAILLE_MAX][TAILLE_MAX], i
     }
 }
 
+// Vérifie les structures complètes après la pose d'une tuile et attribue les points
 void verifier_et_scorer_structures(Plateau* p, int x, int y, Joueur joueurs[], int nb_joueurs) {
     Tuiles t = p->grille[x][y];
 
@@ -198,3 +213,126 @@ void verifier_et_scorer_structures(Plateau* p, int x, int y, Joueur joueurs[], i
         }
     }
 }
+
+
+void calculer_score_prairies_fin_partie(Plateau* p,Joueur joueurs[],int nb_joueurs) {
+    int visite[MAX_VISITE][MAX_VISITE] = {0};
+
+    for (int x = 0; x < TAILLE_MAX; x++)
+    {
+        for (int y = 0; y < TAILLE_MAX; y++)
+        {
+            if (!p->occupes[x][y])
+                continue;
+
+            if (visite[x][y])
+                continue;
+
+            Tuiles t = p->grille[x][y];
+
+            // On ne part que des prairies
+            if (!(t.a == PRAIRIE || t.b == PRAIRIE ||
+                  t.c == PRAIRIE || t.d == PRAIRIE))
+                continue;
+
+            int prairie_visite[MAX_VISITE][MAX_VISITE] = {0};
+            int villes[72] = {0};
+            int meeples[NB_JOUEURS_MAX] = {0};
+
+            // DFS prairie
+            prairie_recursive(p, x, y, prairie_visite);
+
+            // marquer globalement
+            for (int i = 0; i < TAILLE_MAX; i++)
+                for (int j = 0; j < TAILLE_MAX; j++)
+                    if (prairie_visite[i][j])
+                        visite[i][j] = 1;
+
+            // analyser meeples + villes
+            for (int j = 0; j < nb_joueurs; j++)
+            {
+                for (int m = 0; m < 7; m++)
+                {
+                    Meeple *me =
+                        &joueurs[j].stock[m];
+
+                    if (me->etat == 1)
+                        continue;
+
+                    if (me->zone != PRAIRIE)
+                        continue;
+
+                    if (!prairie_visite[me->posX][me->posY])
+                        continue;
+
+                    meeples[j]++;
+                }
+            }
+
+            // compter villes complètes adjacentes
+            for (int i = 0; i < TAILLE_MAX; i++)
+            {
+                for (int j = 0; j < TAILLE_MAX; j++)
+                {
+                    if (!prairie_visite[i][j])
+                        continue;
+
+                    Tuiles tile =
+                        p->grille[i][j];
+
+                    if ((tile.a == VILLE || tile.a == VILLE_BOUCLIER) ||
+                        (tile.b == VILLE || tile.b == VILLE_BOUCLIER) ||
+                        (tile.c == VILLE || tile.c == VILLE_BOUCLIER) ||
+                        (tile.d == VILLE || tile.d == VILLE_BOUCLIER))
+                    {
+                        int v[MAX_VISITE][MAX_VISITE] = {0};
+
+                        if (ville_recursive(p, i, j, v))
+                        {
+                            if (!ville_deja_comptee(villes, tile.id))
+                                villes[tile.id] = 1;
+                        }
+                    }
+                }
+            }
+
+            int nb_villes = 0;
+
+            for (int i = 0; i < 72; i++)
+                if (villes[i])
+                    nb_villes++;
+
+            int points = nb_villes * 3;
+
+            if (points == 0)
+                continue;
+
+            // majorité
+            int max = 0;
+
+            for (int j = 0; j < nb_joueurs; j++)
+                if (meeples[j] > max)
+                    max = meeples[j];
+
+            if (max == 0)
+                continue;
+
+            for (int j = 0; j < nb_joueurs; j++)
+            {
+                if (meeples[j] == max)
+                {
+                    ajouterpoints(&joueurs[j], points);
+
+                    printf(
+                        "%s gagne %d points de prairie\n",
+                        joueurs[j].nom,
+                        points
+                    );
+                }
+            }
+        }
+    }
+
+    printf("Score prairies fin de partie termine.\n");
+}
+
