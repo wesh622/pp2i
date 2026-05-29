@@ -5,18 +5,17 @@
 #include <string.h>
 
 void definirJoueur(Joueur *j, int id, char *name) {
+    memset(j, 0, sizeof(Joueur));  // Initialiser toute la structure à 0
     j->idjoueur = id;
-
     strncpy(j->nom, name, 19);
     j->nom[19] = '\0';
     j->est_IA = 0;
-
     j->score = 0;
+    j->actif = 1;  // Important: actif doit être 1
 
     for (int i = 0; i < 7; i++) {
         init_meeple(&j->stock[i], i + 1, id);
     }
-   
 }
 
 //debut Omar

@@ -26,4 +26,6 @@ void attribuer_points_et_recuperer_meeples(int visite[TAILLE_MAX][TAILLE_MAX], i
 
 void verifier_et_scorer_structures(Plateau* p, int x, int y, Joueur joueurs[], int nb_joueurs);
 
+void calculer_score_prairies_fin_partie(Plateau* p,Joueur joueurs[],int nb_joueurs);
+
 #endif
