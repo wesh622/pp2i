@@ -119,17 +119,17 @@ void boucle_sdl_principale(Plateau* plateau, Pioche* pioche,
                         int emplacement = sdl_choisir_emplacement_meeple(
                                             ctx, *tuile, col_j, interdit);
 
-                        if (emplacement > 0 &&
-                            !interdit[emplacement-1] &&
-                            peut_placer_meeple(plateau, i_case, j_case, emplacement)) {
-                            Meeple* m = premier_meeple_disponible(j);
+                        if (emplacement > 0 && !interdit[emplacement-1]) {
                             int zone = 0;
                             if      (emplacement == 1) zone = tuile->a;
                             else if (emplacement == 2) zone = tuile->b;
                             else if (emplacement == 3) zone = tuile->c;
                             else if (emplacement == 4) zone = tuile->d;
                             else                       zone = tuile->center;
-                            placer_meeple(m, i_case, j_case, zone, emplacement);
+                            if (peut_placer_meeple(plateau, i_case, j_case, zone, emplacement)) {
+                                Meeple* m = premier_meeple_disponible(j);
+                                placer_meeple(m, i_case, j_case, zone, emplacement);
+                            }
                         }
                     }
                 }
@@ -138,7 +138,7 @@ void boucle_sdl_principale(Plateau* plateau, Pioche* pioche,
     }
 
     if (!quitter) {
-        score_final(plateau, conf->tab, total_joueurs);
+        calculer_score_prairies_fin_partie(plateau, conf->tab, total_joueurs);
         tout_afficher(ctx, plateau, pioche, conf, NULL, conf->max_turn,
                       total_joueurs, &conf->tab[0], &vue);
         sdl_afficher_fin_de_partie(ctx, conf->tab, total_joueurs);
