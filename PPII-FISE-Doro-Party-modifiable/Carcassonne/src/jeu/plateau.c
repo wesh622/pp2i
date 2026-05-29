@@ -263,8 +263,26 @@
         printf("\n");
     }
 
- //partie MOHAMED: rajout des fonctions complémentaire de l affichage 
+ //partie MOHAMED: rajout des fonctions complémentaire de l affichage
 
+// wrapper simple pour la compatibilité avec les tests
+void afficher_plateau(Plateau* p){
+    int centre = TAILLE_MAX/2;
+    int rayon = 5;
+    printf("\n=== PLATEAU ===\n");
+    printf("   ");
+    for(int j=centre-rayon;j<=centre+rayon;j++) printf("%3d ",j);
+    printf("\n");
+    for(int i=centre-rayon;i<=centre+rayon;i++){
+        printf("%3d ",i);
+        for(int j=centre-rayon;j<=centre+rayon;j++){
+            if(p->occupes[i][j]) printf("[%02d] ",p->grille[i][j].id);
+            else printf(" ..  ");
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
 
  // Convertit une face de tuile en caractère pour l'affichage
 char face_vers_char(int face) {

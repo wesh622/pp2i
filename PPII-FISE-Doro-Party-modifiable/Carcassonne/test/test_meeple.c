@@ -72,7 +72,8 @@ void test_peut_placer_meeple_coordonnees_valides(void) {
     
     Plateau* p = init_plateau();
     int centre = TAILLE_MAX / 2;
-    
+    poser_tuile(p, tuiles_jeu[0], centre, centre);
+
     // Coordonnees valides sur tuile de depart
     assert(peut_placer_meeple(p, centre, centre, PRAIRIE, 1) == 1);
     
@@ -118,7 +119,8 @@ void test_peut_placer_meeple_emplacement_invalide(void) {
     
     Plateau* p = init_plateau();
     int centre = TAILLE_MAX / 2;
-    
+    poser_tuile(p, tuiles_jeu[0], centre, centre);
+
     // Emplacement 0 (invalide)
     assert(peut_placer_meeple(p, centre, centre, PRAIRIE, 0) == 0);
     
