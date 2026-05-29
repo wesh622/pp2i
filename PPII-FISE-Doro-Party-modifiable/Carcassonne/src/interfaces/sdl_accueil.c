@@ -120,13 +120,13 @@ void sdl_afficher_accueil(ContexteSDL* ctx, config* conf, int total_joueurs) {
                 (SDL_Color){200,200,200,255}, x, yc); yc += 24;
 
     SDL_Color cc = {160, 200, 255, 255};
-    ligne(r, ctx->police, "Clic gauche sur case verte  →  poser la tuile", cc, x, &yc, pas);
-    ligne(r, ctx->police, "R                           →  tourner droite", cc, x, &yc, pas);
-    ligne(r, ctx->police, "L                           →  tourner gauche", cc, x, &yc, pas);
-    ligne(r, ctx->police, "Fleches                     →  deplacer la vue", cc, x, &yc, pas);
-    ligne(r, ctx->police, "Clic zone surlignee         →  placer meeple", cc, x, &yc, pas);
-    ligne(r, ctx->police, "Espace                      →  passer meeple", cc, x, &yc, pas);
-    ligne(r, ctx->police, "Echap                       →  quitter", cc, x, &yc, pas);
+    ligne(r, ctx->police, "Clic gauche sur case verte  -> poser la tuile", cc, x, &yc, pas);
+    ligne(r, ctx->police, "R                           -> tourner droite", cc, x, &yc, pas);
+    ligne(r, ctx->police, "L                           -> tourner gauche", cc, x, &yc, pas);
+    ligne(r, ctx->police, "Fleches                     -> deplacer la vue", cc, x, &yc, pas);
+    ligne(r, ctx->police, "Clic zone surlignee         -> placer meeple", cc, x, &yc, pas);
+    ligne(r, ctx->police, "Espace                      -> passer meeple", cc, x, &yc, pas);
+    ligne(r, ctx->police, "Echap                       -> quitter", cc, x, &yc, pas);
 
     // ── SCORE RAPIDE ───────────────────────────────────────
     int ys = 460;

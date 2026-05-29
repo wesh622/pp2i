@@ -80,6 +80,44 @@ void sdl_afficher_panel(ContexteSDL* ctx, Joueur* j, Pioche* pioche,
         y += TAILLE_CASE + 8;
     }
 
+    // couleurs des joueurs
+    y += 4;
+    sdl_texte(r, ctx->police, "--- Joueurs ---",
+              (SDL_Color){160,160,160,255}, PX_PANEL + LARGEUR_PANEL/2, y);
+    y += 18;
+    for (int k = 0; k < total_joueurs; k++) {
+        if (!tous_joueurs[k].actif) continue;
+        SDL_Color col = couleur_joueur(tous_joueurs[k].idjoueur - 1);
+        SDL_SetRenderDrawColor(r, col.r, col.g, col.b, 255);
+        SDL_Rect carre_j = {PX_PANEL + 10, y + 2, 12, 12};
+        SDL_RenderFillRect(r, &carre_j);
+        char nom_buf[32];
+        snprintf(nom_buf, sizeof(nom_buf), "%s%s", tous_joueurs[k].nom,
+                 tous_joueurs[k].est_IA ? " (IA)" : "");
+        sdl_texte_g(r, ctx->police, nom_buf, col, PX_PANEL + 28, y);
+        y += 16;
+    }
+
+    // legende des zones
+    y += 8;
+    sdl_texte(r, ctx->police, "--- Zones ---",
+              (SDL_Color){160,160,160,255}, PX_PANEL + LARGEUR_PANEL/2, y);
+    y += 18;
+    static const int zones[] = {
+        ROUTE_PRAIRIE, PRAIRIE, VILLE, VILLE_BOUCLIER, ABBAYE, CARREFOUR
+    };
+    for (int k = 0; k < 6; k++) {
+        SDL_Color col = couleur_sdl_face(zones[k]);
+        SDL_SetRenderDrawColor(r, col.r, col.g, col.b, 255);
+        SDL_Rect carre_z = {PX_PANEL + 10, y + 2, 12, 12};
+        SDL_RenderFillRect(r, &carre_z);
+        SDL_SetRenderDrawColor(r, 180, 180, 180, 255);
+        SDL_RenderDrawRect(r, &carre_z);
+        sdl_texte_g(r, ctx->police, symbole_face(zones[k]),
+                    (SDL_Color){200,200,200,255}, PX_PANEL + 28, y);
+        y += 16;
+    }
+
     y = HAUTEUR_FENETRE - 90;
     sdl_texte(r, ctx->police, "Clic G : poser tuile",    (SDL_Color){120,120,120,255}, PX_PANEL + LARGEUR_PANEL/2, y); y += 15;
     sdl_texte(r, ctx->police, "R : tourner droite",      (SDL_Color){120,120,120,255}, PX_PANEL + LARGEUR_PANEL/2, y); y += 15;
