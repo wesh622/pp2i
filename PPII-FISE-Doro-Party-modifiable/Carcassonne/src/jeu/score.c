@@ -68,22 +68,22 @@ int compter_points_ville(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE
         pts += 1; 
     }
 
-    // On explore les 4 directions
+    // On explore les 4 directions (a=Nord→y+1, b=Est→x+1, c=Sud→y-1, d=Ouest→x-1)
     if (t.a == VILLE || t.a == VILLE_BOUCLIER) {
-        pts += compter_points_ville(p, x-1, y, visite);
-    } 
+        pts += compter_points_ville(p, x, y+1, visite);
+    }
 
     if (t.b == VILLE || t.b == VILLE_BOUCLIER) {
-        pts += compter_points_ville(p, x, y+1, visite);
-    } 
-
-    if (t.c == VILLE || t.c == VILLE_BOUCLIER) {
         pts += compter_points_ville(p, x+1, y, visite);
     }
 
-    if (t.d == VILLE || t.d == VILLE_BOUCLIER) {
+    if (t.c == VILLE || t.c == VILLE_BOUCLIER) {
         pts += compter_points_ville(p, x, y-1, visite);
-    } 
+    }
+
+    if (t.d == VILLE || t.d == VILLE_BOUCLIER) {
+        pts += compter_points_ville(p, x-1, y, visite);
+    }
 
     return pts;
 }
@@ -102,17 +102,17 @@ int compter_points_route(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE
     int pts = 1; // 1 point par tuile route
 
     if (t.a == ROUTE_PRAIRIE) {
-        pts += compter_points_route(p, x-1, y, visite);
-    } 
-    if (t.b == ROUTE_PRAIRIE) {
         pts += compter_points_route(p, x, y+1, visite);
-    } 
-    if (t.c == ROUTE_PRAIRIE) {
+    }
+    if (t.b == ROUTE_PRAIRIE) {
         pts += compter_points_route(p, x+1, y, visite);
-    } 
-    if (t.d == ROUTE_PRAIRIE) {
+    }
+    if (t.c == ROUTE_PRAIRIE) {
         pts += compter_points_route(p, x, y-1, visite);
-    } 
+    }
+    if (t.d == ROUTE_PRAIRIE) {
+        pts += compter_points_route(p, x-1, y, visite);
+    }
 
     return pts;
 }
