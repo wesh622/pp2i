@@ -23,17 +23,23 @@ static void dessiner_meeple_sur_tuile(SDL_Renderer* r, int px, int py,
     int tiers = tc / 3;
     int mx, my;
     switch (emplacement) {
-        case 1: mx = px + tc/2;        my = py + tiers/2;      break;  // Nord
-        case 2: mx = px + tc - tiers/2; my = py + tc/2;        break;  // Est
-        case 3: mx = px + tc/2;        my = py + tc - tiers/2; break;  // Sud
-        case 4: mx = px + tiers/2;     my = py + tc/2;         break;  // Ouest
-        case 5: mx = px + tc/2;        my = py + tc/2;         break;  // Centre
+        case 1: mx = px + tc/2;         my = py + tiers/2;       break;  // Nord
+        case 2: mx = px + tc - tiers/2; my = py + tc/2;          break;  // Est
+        case 3: mx = px + tc/2;         my = py + tc - tiers/2;  break;  // Sud
+        case 4: mx = px + tiers/2;      my = py + tc/2;          break;  // Ouest
+        case 5: mx = px + tc/2;         my = py + tc/2;          break;  // Centre
         default: return;
     }
-    int s = 8;
+    int s = 14;
+    // contour blanc pour le faire ressortir sur n'importe quel fond
+    SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+    SDL_Rect bord = {mx - s/2 - 2, my - s/2 - 2, s + 4, s + 4};
+    SDL_RenderFillRect(r, &bord);
+    // corps couleur joueur
     SDL_SetRenderDrawColor(r, col.r, col.g, col.b, 255);
     SDL_Rect rect = {mx - s/2, my - s/2, s, s};
     SDL_RenderFillRect(r, &rect);
+    // contour noir fin
     SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
     SDL_RenderDrawRect(r, &rect);
 }
