@@ -7,7 +7,6 @@
 #include "config.h"
 
 void afficher_plateau_cli(Plateau *p);
-void afficher_plateau_cli_ameliore_pour_placer_tuile(Plateau *p, Tuiles *t);
 void afficher_tour(int numero_tour, Joueur *j);
 void afficher_tuile(Tuiles t);
 

@@ -62,54 +62,55 @@
     int peut_poser_tuile_silent(Plateau* p, Tuiles* t, int x, int y){
         if(p->occupes[x][y] == 1) return 0;
         if(x < 0 || x >= TAILLE_MAX || y < 0 || y >= TAILLE_MAX) return 0;
+        
         int a = 0, b = 0, c = 0, d = 0;
-        if(x > 0 && p->occupes[x-1][y]) b = 1;
-        if(x < TAILLE_MAX-1 && p->occupes[x+1][y]) a = 1;
-        if(y > 0 && p->occupes[x][y-1]) d = 1;
-        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]) c = 1;
-        int adjacence = a+b+c+d;
-        if (adjacence == 0) return 0;
-        // Vérification compatibilité
+        if(x > 0 && p->occupes[x-1][y]) a = 1;
+        if(x < TAILLE_MAX-1 && p->occupes[x+1][y]) b = 1;
+        if(y > 0 && p->occupes[x][y-1]) c = 1;
+        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]) d = 1;
+        if (a+b+c+d > 0) return 0;
+        int compatible = 0;
         if(x < TAILLE_MAX-1 && p->occupes[x+1][y]){
-            int surface_bas = p->grille[x+1][y].a; //surface adjacente de la tuile en bas
-            if (
-                surface_bas != t->c &&
-                !((surface_bas == 3 && t->c == 4) || (surface_bas == 4 && t->c == 3) ||
-                (surface_bas== 6 && t->c == 1) || (surface_bas == 1 && t->c == 6))
-            ) {
-                return 0;
-            }
-        }
-        if(x > 0 && p->occupes[x-1][y]){
-            int surface_haut = p->grille[x-1][y].c; //surface adjacente de la tuile en haut
-            if (
-                surface_haut != t->a &&
-                !((surface_haut == 3 && t->a == 4) || (surface_haut == 4 && t->a == 3) ||
-                (surface_haut == 6 && t->a == 1) || (surface_haut == 1 && t->a == 6))
-            ) {
-                return 0;
-            }
-        }
-        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]){
-            int surface_droite = p->grille[x][y+1].d; //surface adjacente de la tuile a droite
+            int surface_droite = p->grille[x+1][y].d;
             if (
                 surface_droite != t->b &&
                 !((surface_droite == 3 && t->b == 4) || (surface_droite == 4 && t->b == 3) ||
                 (surface_droite == 6 && t->b == 1) || (surface_droite == 1 && t->b == 6))
             ) {
-                return 0;
+                compatible = 1;
             }
         }
-        if(y > 0 && p->occupes[x][y-1]){
-            int surface_gauche = p->grille[x][y-1].b; //surface adjacente de la tuile a gauche
+        if(x > 0 && p->occupes[x-1][y]){
+            int surface_gauche = p->grille[x-1][y].b;
             if (
                 surface_gauche != t->d &&
                 !((surface_gauche == 3 && t->d == 4) || (surface_gauche == 4 && t->d == 3) ||
                 (surface_gauche == 6 && t->d == 1) || (surface_gauche == 1 && t->d == 6))
             ) {
-                return 0;
+                compatible = 1;
             }
         }
+        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]){
+            int surface_haut = p->grille[x][y+1].c;
+            if (
+                surface_haut != t->a &&
+                !((surface_haut == 3 && t->a == 4) || (surface_haut == 4 && t->a == 3) ||
+                (surface_haut == 6 && t->a == 1) || (surface_haut == 1 && t->a == 6))
+            ) {
+                compatible = 1;
+            }
+        }
+        if(y > 0 && p->occupes[x][y-1]){
+            int surface_bas = p->grille[x][y-1].a;
+            if (
+                surface_bas != t->c &&
+                !((surface_bas == 3 && t->c == 4) || (surface_bas == 4 && t->c == 3) ||
+                (surface_bas == 6 && t->c == 1) || (surface_bas == 1 && t->c == 6))
+            ) {
+                compatible = 1;
+            }
+        }
+        if (compatible == 1) return 0;
         return 1;
     }
 
@@ -119,79 +120,85 @@
             printf("Cette case est occupee, veuillez en choisir une autre\n");
             return 0;
         }
+        
         //verification 2 : coordonne hors limites ?
         if(x < 0 || x >= TAILLE_MAX || y < 0 || y >= TAILLE_MAX){
             printf("Coordonnees hors du plateau\n");
             return 0;
         }
+        
         //verification 3 : au moins une tuile adjacente ?
         int a = 0; //tuile a droite
         int b = 0; //tuile a gauche  
         int c = 0; //tuile en haut
         int d = 0; //tuile en bas
-        if(x > 0 && p->occupes[x][y-1]) {
+        
+        if(x > 0 && p->occupes[x-1][y]){
             b = 1;
         }
-        if(x < TAILLE_MAX-1 && p->occupes[x][y+1]) {
+        if(x < TAILLE_MAX-1 && p->occupes[x+1][y]){
             a = 1;
         }
-        if(y > 0 && p->occupes[x+1][y]) {
+        if(y > 0 && p->occupes[x][y-1]){
             d = 1;
         }
-        if(y < TAILLE_MAX-1 && p->occupes[x-1][y]) {
+        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]){
             c = 1;
         }
+        
         int adjacence = a+b+c+d;
         
         if(adjacence == 0){
             printf("Cette case n'est reliee a aucune autre tuile, veuillez en choisir une autre\n");
             return 0;
         }
+
         //verification 4 : Tuiles adjacentes compatibles
+        int compatible = 0;
         if(x < TAILLE_MAX-1 && p->occupes[x+1][y]){
-            int surface_bas = p->grille[x+1][y].a; //surface adjacente de la tuile en bas
-            if (
-                surface_bas != t.c &&
-                !((surface_bas == 3 && t.c == 4) || (surface_bas == 4 && t.c == 3) ||
-                (surface_bas== 6 && t.c == 1) || (surface_bas == 1 && t.c == 6))
-            ) {
-                printf("La tuile n'est pas compatible avec la tuile en bas\n");
-                return 0;
-            }
-        }
-        if(x > 0 && p->occupes[x-1][y]){
-            int surface_haut = p->grille[x-1][y].c; //surface adjacente de la tuile en haut
-            if (
-                surface_haut != t.a &&
-                !((surface_haut == 3 && t.a == 4) || (surface_haut == 4 && t.a == 3) ||
-                (surface_haut == 6 && t.a == 1) || (surface_haut == 1 && t.a == 6))
-            ) {
-                printf("La tuile n'est pas compatible avec la tuile en haut\n");
-                return 0;
-            }
-        }
-        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]){
-            int surface_droite = p->grille[x][y+1].d; //surface adjacente de la tuile a droite
+            int surface_droite = p->grille[x+1][y].d; //surface adjacente de la tuile a droite
             if (
                 surface_droite != t.b &&
                 !((surface_droite == 3 && t.b == 4) || (surface_droite == 4 && t.b == 3) ||
                 (surface_droite == 6 && t.b == 1) || (surface_droite == 1 && t.b == 6))
             ) {
-                printf("La tuile n'est pas compatible avec la tuile a droite\n");
-                return 0;
+                compatible = 1;
             }
         }
-        if(y > 0 && p->occupes[x][y-1]){
-            int surface_gauche = p->grille[x][y-1].b; //surface adjacente de la tuile a gauche
+        if(x > 0 && p->occupes[x-1][y]){
+            int surface_gauche = p->grille[x-1][y].b; //surface adjacente de la tuile a gauche  
             if (
                 surface_gauche != t.d &&
                 !((surface_gauche == 3 && t.d == 4) || (surface_gauche == 4 && t.d == 3) ||
                 (surface_gauche == 6 && t.d == 1) || (surface_gauche == 1 && t.d == 6))
             ) {
-                printf("La tuile n'est pas compatible avec la tuile a gauche\n");
-                return 0;
+                compatible = 1;
             }
         }
+        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]){
+            int surface_haut = p->grille[x][y+1].c; //surface adjacente de la tuile en haut
+            if (
+                surface_haut != t.a &&
+                !((surface_haut == 3 && t.a == 4) || (surface_haut == 4 && t.a == 3) ||
+                (surface_haut == 6 && t.a == 1) || (surface_haut == 1 && t.a == 6))
+            ) {
+                compatible = 1;
+            }
+        }
+        if(y > 0 && p->occupes[x][y-1]){
+            int surface_bas = p->grille[x][y-1].a; //surface adjacente de la tuile en bas
+            if (
+                surface_bas != t.c &&
+                !((surface_bas == 3 && t.c == 4) || (surface_bas == 4 && t.c == 3) ||
+                (surface_bas == 6 && t.c == 1) || (surface_bas == 1 && t.c == 6))
+            ) {
+                compatible = 1;
+            }
+        }
+        if (compatible == 1) {
+            printf("La tuile n'est pas compatible avec les tuiles adjacentes, veuillez en choisir une autre\n");
+            return 0;
+        } 
         return 1;
     }
 

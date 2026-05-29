@@ -7,21 +7,24 @@
 #include "pioche.h"
 #include "config.h"
 
+/* =========================================================
+ *  UTILITAIRES INTERNES
+ * ========================================================= */
 
 /* Retourne la couleur ANSI correspondant à un type de face */
 static const char* couleur_face(int face) {
     switch (face) {
-        case ROUTE_PRAIRIE: return "\033[33m";   // jaune  – route 
-        case PRAIRIE:       return "\033[32m";   /* vert   – prairie 
-        case VILLE:         return "\033[34m";   /* bleu   – ville 
-        case VILLE_BOUCLIER:return "\033[36m";   /* cyan   – ville+bouclier 
-        case ABBAYE:        return "\033[35m";   /* violet – abbaye *
+        case ROUTE_PRAIRIE: return "\033[33m";   /* jaune  – route */
+        case PRAIRIE:       return "\033[32m";   /* vert   – prairie */
+        case VILLE:         return "\033[34m";   /* bleu   – ville */
+        case VILLE_BOUCLIER:return "\033[36m";   /* cyan   – ville+bouclier */
+        case ABBAYE:        return "\033[35m";   /* violet – abbaye */
         case CARREFOUR:     return "\033[31m";   /* rouge  – carrefour */
         default:            return "\033[0m";
     }
 }
 
-#define RESET " \033[0m"
+#define RESET "\033[0m"
 
 /* Retourne le symbole (3 cars) d'une face, centré */
 static const char* sym_face(int face) {
@@ -40,7 +43,7 @@ static const char* sym_face(int face) {
 static char lettre_face(int face) {
     switch (face) {
         case ROUTE_PRAIRIE: return 'r';
-        case PRAIRIE:       return 'p';
+        case PRAIRIE:       return '.';
         case VILLE:         return 'V';
         case VILLE_BOUCLIER:return 'W';
         case ABBAYE:        return 'A';
@@ -99,7 +102,7 @@ void afficher_tuile_compacte(Tuiles t) {
     const char* cC = couleur_face(t.center);
 
     printf("      %s%c%s\n", cN, n, RESET);
-    printf("    %s%c%s%s%c%s%s%c%s\n", cO,o,RESET, cC,c,RESET, cE,e,RESET);
+    printf("    %s%c%s %s%c%s %s%c%s\n", cO,o,RESET, cC,c,RESET, cE,e,RESET);
     printf("      %s%c%s\n", cS, s, RESET);
     printf("    id: %d\n", t.id);
 }
@@ -120,49 +123,23 @@ void afficher_plateau_cli_ameliore(Plateau *p) {
     /* En-tête colonnes */
     printf("     ");
     for (int j = centre - rayon; j <= centre + rayon; j++) {
-        printf(" %3d   ", j);
+        printf(" %3d ", j);
     }
     printf("\n");
 
-
     for (int i = centre - rayon; i <= centre + rayon; i++) {
-        // Affichage sur 3 sous-lignes : nord, centre, sud
-        // Ligne 1 : Nord
-        printf("    ");
+        /* Ligne de la rangée */
+        printf("%3d  ", i);
         for (int j = centre - rayon; j <= centre + rayon; j++) {
             if (p->occupes[i][j]) {
                 Tuiles t = p->grille[i][j];
-                printf("  %s%c%s  ", couleur_face(t.a), lettre_face(t.a), RESET);
-                printf(" ");
-            } else {
-                printf("       ");
-            }
-        }
-        printf("\n");
-        // Ligne 2 : Ouest Centre Est
-        printf("%3d ", i);
-        for (int j = centre - rayon; j <= centre + rayon; j++) {
-            if (p->occupes[i][j]) {
-                Tuiles t = p->grille[i][j];
-                printf("%s%c%s%s%c%s%s%c%s",
-                    couleur_face(t.d), lettre_face(t.d), RESET, 
+                /* Cellule compacte : Nord/Est/Sud/Ouest/Centre en 1 char coloré */
+                printf(" %s%c%s%s%c%s%s%c%s ",
+                    couleur_face(t.a), lettre_face(t.a), RESET,
                     couleur_face(t.center), lettre_face(t.center), RESET,
-                    couleur_face(t.b), lettre_face(t.b), RESET);
-                printf(" ");
+                    couleur_face(t.c), lettre_face(t.c), RESET);
             } else {
-                printf("\033[90m  ·  \033[0m");
-                printf("  ");
-            }
-        }
-        printf("\n    ");
-        // Ligne 3 : Sud
-        for (int j = centre - rayon; j <= centre + rayon; j++) {
-            if (p->occupes[i][j]) {
-                Tuiles t = p->grille[i][j];
-                printf("  %s%c%s  ", couleur_face(t.c), lettre_face(t.c), RESET);
-                printf(" ");
-            } else {
-                printf("       ");
+                printf("\033[90m  ·  \033[0m");  /* gris – vide */
             }
         }
         printf("\n");
@@ -171,88 +148,7 @@ void afficher_plateau_cli_ameliore(Plateau *p) {
 
     /* Légende */
     printf("Légende : "
-           "%sp%s=Prairie  "
-           "%sr%s=Route  "
-           "%sV%s=Ville  "
-           "%sW%s=VilleBouclier  "
-           "%sA%s=Abbaye  "
-           "%sX%s=Carrefour\n\n",
-        couleur_face(PRAIRIE),       RESET,
-        couleur_face(ROUTE_PRAIRIE), RESET,
-        couleur_face(VILLE),         RESET,
-        couleur_face(VILLE_BOUCLIER),RESET,
-        couleur_face(ABBAYE),        RESET,
-        couleur_face(CARREFOUR),     RESET);
-}
-
-void afficher_plateau_cli_ameliore_pour_placer_tuile(Plateau *p, Tuiles *t) {
-    int centre = TAILLE_MAX / 2;
-    int rayon  = 5;
-
-    printf("\n\033[1m=== PLATEAU ===\033[0m\n");
-
-    /* En-tête colonnes */
-    printf("    ");
-    for (int j = centre - rayon; j <= centre + rayon; j++) {
-        printf(" %3d   ", j);
-    }
-    printf("\n");
-
-
-    for (int i = centre - rayon; i <= centre + rayon; i++) {
-        // Affichage sur 3 sous-lignes : nord, centre, sud
-        // Ligne 1 : Nord
-        printf("    ");
-        for (int j = centre - rayon; j <= centre + rayon; j++) {
-            if (p->occupes[i][j]) {
-                Tuiles t = p->grille[i][j];
-                printf("  %s%c%s  ", couleur_face(t.a), lettre_face(t.a), RESET);
-                printf(" ");
-            } else {
-                printf("       ");
-            }
-        }
-        printf("\n");
-        // Ligne 2 : Ouest Centre Est
-        printf("%3d ", i);
-        for (int j = centre - rayon; j <= centre + rayon; j++) {
-            if (p->occupes[i][j]) {
-                Tuiles t = p->grille[i][j];
-                printf("%s%c%s%s%c%s%s%c%s",
-                    couleur_face(t.d), lettre_face(t.d), RESET, 
-                    couleur_face(t.center), lettre_face(t.center), RESET,
-                    couleur_face(t.b), lettre_face(t.b), RESET);
-                printf(" ");
-            } else {
-                if (peut_poser_tuile_silent(p, t, i, j) == 1) {
-                    printf("\033[32m  ·  \033[0m");
-                    printf("  ");
-
-                } else {
-                    printf("\033[31m  ·  \033[0m");
-                    printf("  ");
-                }
-            }
-        }
-        printf("\n    ");
-
-        // Ligne 3 : Sud
-        for (int j = centre - rayon; j <= centre + rayon; j++) {
-            if (p->occupes[i][j]) {
-                Tuiles t = p->grille[i][j];
-                printf("  %s%c%s  ", couleur_face(t.c), lettre_face(t.c), RESET);
-                printf(" ");
-            } else {
-                printf("       ");
-            }
-        }
-        printf("\n");
-    }
-    printf("\n");
-
-    /* Légende */
-    printf("Légende : "
-           "%sp%s=Prairie  "
+           "%s.%s=Prairie  "
            "%sr%s=Route  "
            "%sV%s=Ville  "
            "%sW%s=VilleBouclier  "
