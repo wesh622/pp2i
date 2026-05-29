@@ -76,26 +76,28 @@ Tuiles tuiles_jeu[] = {
 };
 
 Tuiles* tourner_vers_droite(Tuiles* t){
+    Tuiles* new = t;
     int a = t->a;
     int b = t->b;
     int c = t->c;
     int d = t->d;
-    t->a=d;
-    t->b=a;
-    t->c=b;
-    t->d=c;
-    return t;
+    new->a = d;
+    new->b = a;
+    new->c = b;
+    new->d = c;
+    return new;
 }
 
 Tuiles* tourner_vers_gauche(Tuiles* t){
+    Tuiles* new = t;
     int a = t->a;
     int b = t->b;
     int c = t->c;
     int d = t->d;
-    t->a=b;
-    t->b=c;
-    t->c=d;
-    t->d=a;
-    return t;
+    new->a=b;
+    new->b=c;
+    new->c=d;
+    new->d=a;
+    return new;
 }
 
