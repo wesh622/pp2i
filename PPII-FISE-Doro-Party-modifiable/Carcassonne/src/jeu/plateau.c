@@ -63,49 +63,49 @@
         if(p->occupes[x][y] == 1) return 0;
         if(x < 0 || x >= TAILLE_MAX || y < 0 || y >= TAILLE_MAX) return 0;
         
-        int voisins = 0;
-        if(x > 0 && p->occupes[x-1][y]) voisins++;
-        if(x < TAILLE_MAX-1 && p->occupes[x+1][y]) voisins++;
-        if(y > 0 && p->occupes[x][y-1]) voisins++;
-        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]) voisins++;
-        if (voisins == 0) return 0;
+        int a = 0, b = 0, c = 0, d = 0;
+        if(x > 0 && p->occupes[x-1][y]) a = 1;
+        if(x < TAILLE_MAX-1 && p->occupes[x+1][y]) b = 1;
+        if(y > 0 && p->occupes[x][y-1]) c = 1;
+        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]) d = 1;
+        if (a+b+c+d > 0) return 0;
         int compatible = 0;
         if(x < TAILLE_MAX-1 && p->occupes[x+1][y]){
-            int surface = p->grille[x+1][y].a;
+            int surface_droite = p->grille[x+1][y].d;
             if (
-                surface != t->c &&
-                !((surface == 3 && t->c == 4) || (surface == 4 && t->c == 3) ||
-                (surface == 6 && t->c == 1) || (surface == 1 && t->c == 6))
+                surface_droite != t->b &&
+                !((surface_droite == 3 && t->b == 4) || (surface_droite == 4 && t->b == 3) ||
+                (surface_droite == 6 && t->b == 1) || (surface_droite == 1 && t->b == 6))
             ) {
                 compatible = 1;
             }
         }
         if(x > 0 && p->occupes[x-1][y]){
-            int surface = p->grille[x-1][y].c;
+            int surface_gauche = p->grille[x-1][y].b;
             if (
-                surface != t->a &&
-                !((surface == 3 && t->a == 4) || (surface == 4 && t->a == 3) ||
-                (surface == 6 && t->a == 1) || (surface == 1 && t->a == 6))
+                surface_gauche != t->d &&
+                !((surface_gauche == 3 && t->d == 4) || (surface_gauche == 4 && t->d == 3) ||
+                (surface_gauche == 6 && t->d == 1) || (surface_gauche == 1 && t->d == 6))
             ) {
                 compatible = 1;
             }
         }
         if(y < TAILLE_MAX-1 && p->occupes[x][y+1]){
-            int surface = p->grille[x][y+1].d;
+            int surface_haut = p->grille[x][y+1].c;
             if (
-                surface != t->b &&
-                !((surface == 3 && t->b == 4) || (surface == 4 && t->b == 3) ||
-                (surface == 6 && t->b == 1) || (surface == 1 && t->b == 6))
+                surface_haut != t->a &&
+                !((surface_haut == 3 && t->a == 4) || (surface_haut == 4 && t->a == 3) ||
+                (surface_haut == 6 && t->a == 1) || (surface_haut == 1 && t->a == 6))
             ) {
                 compatible = 1;
             }
         }
         if(y > 0 && p->occupes[x][y-1]){
-            int surface = p->grille[x][y-1].b;
+            int surface_bas = p->grille[x][y-1].a;
             if (
-                surface != t->d &&
-                !((surface == 3 && t->d == 4) || (surface == 4 && t->d == 3) ||
-                (surface == 6 && t->d == 1) || (surface == 1 && t->d == 6))
+                surface_bas != t->c &&
+                !((surface_bas == 3 && t->c == 4) || (surface_bas == 4 && t->c == 3) ||
+                (surface_bas == 6 && t->c == 1) || (surface_bas == 1 && t->c == 6))
             ) {
                 compatible = 1;
             }
@@ -154,47 +154,43 @@
         }
 
         //verification 4 : Tuiles adjacentes compatibles
-        // x+1 = voisin au sud  : sa face nord (.a) doit matcher notre face sud (t.c)
-        // x-1 = voisin au nord : sa face sud  (.c) doit matcher notre face nord (t.a)
-        // y+1 = voisin a l'est : sa face ouest (.d) doit matcher notre face est  (t.b)
-        // y-1 = voisin a l'ouest : sa face est (.b) doit matcher notre face ouest (t.d)
         int compatible = 0;
         if(x < TAILLE_MAX-1 && p->occupes[x+1][y]){
-            int surface = p->grille[x+1][y].a;
+            int surface_droite = p->grille[x+1][y].d; //surface adjacente de la tuile a droite
             if (
-                surface != t.c &&
-                !((surface == 3 && t.c == 4) || (surface == 4 && t.c == 3) ||
-                (surface == 6 && t.c == 1) || (surface == 1 && t.c == 6))
+                surface_droite != t.b &&
+                !((surface_droite == 3 && t.b == 4) || (surface_droite == 4 && t.b == 3) ||
+                (surface_droite == 6 && t.b == 1) || (surface_droite == 1 && t.b == 6))
             ) {
                 compatible = 1;
             }
         }
         if(x > 0 && p->occupes[x-1][y]){
-            int surface = p->grille[x-1][y].c;
+            int surface_gauche = p->grille[x-1][y].b; //surface adjacente de la tuile a gauche  
             if (
-                surface != t.a &&
-                !((surface == 3 && t.a == 4) || (surface == 4 && t.a == 3) ||
-                (surface == 6 && t.a == 1) || (surface == 1 && t.a == 6))
+                surface_gauche != t.d &&
+                !((surface_gauche == 3 && t.d == 4) || (surface_gauche == 4 && t.d == 3) ||
+                (surface_gauche == 6 && t.d == 1) || (surface_gauche == 1 && t.d == 6))
             ) {
                 compatible = 1;
             }
         }
         if(y < TAILLE_MAX-1 && p->occupes[x][y+1]){
-            int surface = p->grille[x][y+1].d;
+            int surface_haut = p->grille[x][y+1].c; //surface adjacente de la tuile en haut
             if (
-                surface != t.b &&
-                !((surface == 3 && t.b == 4) || (surface == 4 && t.b == 3) ||
-                (surface == 6 && t.b == 1) || (surface == 1 && t.b == 6))
+                surface_haut != t.a &&
+                !((surface_haut == 3 && t.a == 4) || (surface_haut == 4 && t.a == 3) ||
+                (surface_haut == 6 && t.a == 1) || (surface_haut == 1 && t.a == 6))
             ) {
                 compatible = 1;
             }
         }
         if(y > 0 && p->occupes[x][y-1]){
-            int surface = p->grille[x][y-1].b;
+            int surface_bas = p->grille[x][y-1].a; //surface adjacente de la tuile en bas
             if (
-                surface != t.d &&
-                !((surface == 3 && t.d == 4) || (surface == 4 && t.d == 3) ||
-                (surface == 6 && t.d == 1) || (surface == 1 && t.d == 6))
+                surface_bas != t.c &&
+                !((surface_bas == 3 && t.c == 4) || (surface_bas == 4 && t.c == 3) ||
+                (surface_bas == 6 && t.c == 1) || (surface_bas == 1 && t.c == 6))
             ) {
                 compatible = 1;
             }
@@ -202,7 +198,7 @@
         if (compatible == 1) {
             printf("La tuile n'est pas compatible avec les tuiles adjacentes, veuillez en choisir une autre\n");
             return 0;
-        }
+        } 
         return 1;
     }
 
