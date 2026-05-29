@@ -1,6 +1,7 @@
 # Binaires compilés
 exec/
 carcassonne
+carcassonne_sdl
 test_argc
 test_plateau
 test_score
