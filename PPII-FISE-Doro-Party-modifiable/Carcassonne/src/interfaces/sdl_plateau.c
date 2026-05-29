@@ -17,31 +17,35 @@ void pixel_vers_grille(int mx, int my, VueSDL vue, int* i, int* j) {
     *j = mx / TAILLE_CASE + vue.centre_j - RAYON_VUE;
 }
 
-static void dessiner_meeple_sur_tuile(SDL_Renderer* r, int px, int py,
+static void dessiner_meeple_sur_tuile(ContexteSDL* ctx, int px, int py,
                                       int emplacement, SDL_Color col) {
     int tc    = TAILLE_CASE;
     int tiers = tc / 3;
     int mx, my;
     switch (emplacement) {
-        case 1: mx = px + tc/2;         my = py + tiers/2;       break;  // Nord
-        case 2: mx = px + tc - tiers/2; my = py + tc/2;          break;  // Est
-        case 3: mx = px + tc/2;         my = py + tc - tiers/2;  break;  // Sud
-        case 4: mx = px + tiers/2;      my = py + tc/2;          break;  // Ouest
-        case 5: mx = px + tc/2;         my = py + tc/2;          break;  // Centre
+        case 1: mx = px + tc/2;         my = py + tiers/2;       break;
+        case 2: mx = px + tc - tiers/2; my = py + tc/2;          break;
+        case 3: mx = px + tc/2;         my = py + tc - tiers/2;  break;
+        case 4: mx = px + tiers/2;      my = py + tc/2;          break;
+        case 5: mx = px + tc/2;         my = py + tc/2;          break;
         default: return;
     }
-    int s = 14;
-    // contour blanc pour le faire ressortir sur n'importe quel fond
-    SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
-    SDL_Rect bord = {mx - s/2 - 2, my - s/2 - 2, s + 4, s + 4};
-    SDL_RenderFillRect(r, &bord);
-    // corps couleur joueur
-    SDL_SetRenderDrawColor(r, col.r, col.g, col.b, 255);
-    SDL_Rect rect = {mx - s/2, my - s/2, s, s};
-    SDL_RenderFillRect(r, &rect);
-    // contour noir fin
-    SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
-    SDL_RenderDrawRect(r, &rect);
+    int s = 18;
+    if (ctx->texture_meeple) {
+        SDL_SetTextureColorMod(ctx->texture_meeple, col.r, col.g, col.b);
+        SDL_SetTextureAlphaMod(ctx->texture_meeple, 255);
+        SDL_Rect dst = {mx - s/2, my - s/2, s, s};
+        SDL_RenderCopy(ctx->renderer, ctx->texture_meeple, NULL, &dst);
+    } else {
+        SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 255, 255);
+        SDL_Rect bord = {mx - s/2 - 2, my - s/2 - 2, s + 4, s + 4};
+        SDL_RenderFillRect(ctx->renderer, &bord);
+        SDL_SetRenderDrawColor(ctx->renderer, col.r, col.g, col.b, 255);
+        SDL_Rect rect = {mx - s/2, my - s/2, s, s};
+        SDL_RenderFillRect(ctx->renderer, &rect);
+        SDL_SetRenderDrawColor(ctx->renderer, 0, 0, 0, 255);
+        SDL_RenderDrawRect(ctx->renderer, &rect);
+    }
 }
 
 void sdl_afficher_plateau(ContexteSDL* ctx, Plateau* p,
@@ -54,15 +58,14 @@ void sdl_afficher_plateau(ContexteSDL* ctx, Plateau* p,
             grille_vers_pixel(i, j, vue, &px, &py);
 
             if (p->occupes[i][j]) {
-                sdl_dessiner_tuile(ctx->renderer, ctx->police, p->grille[i][j], px, py, 0);
+                sdl_dessiner_tuile(ctx, p->grille[i][j], px, py, 0);
 
-                // dessiner les meeples posés sur cette case
                 for (int k = 0; k < total_joueurs; k++) {
                     for (int m = 0; m < 7; m++) {
                         Meeple* meeple = &joueurs[k].stock[m];
                         if (meeple->etat == 0 && meeple->posX == i && meeple->posY == j) {
                             SDL_Color col = couleur_joueur(joueurs[k].idjoueur - 1);
-                            dessiner_meeple_sur_tuile(ctx->renderer, px, py, meeple->emplacement, col);
+                            dessiner_meeple_sur_tuile(ctx, px, py, meeple->emplacement, col);
                         }
                     }
                 }

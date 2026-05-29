@@ -30,7 +30,7 @@ int sdl_choisir_emplacement_meeple(ContexteSDL* ctx, Tuiles t,
     /* tuile zoomée centrée */
     int zpx = largeur_jeu/2 - ZOOM/2;
     int zpy = HAUTEUR_FENETRE/2 - ZOOM/2;
-    sdl_dessiner_tuile_zoom(r, ctx->police_grande, t, zpx, zpy, ZOOM);
+    sdl_dessiner_tuile_zoom(ctx, t, zpx, zpy, ZOOM);
 
     /* surligner les 5 zones */
     SDL_SetRenderDrawBlendMode(r, SDL_BLENDMODE_BLEND);

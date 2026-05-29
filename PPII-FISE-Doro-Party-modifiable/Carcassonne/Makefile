@@ -1,7 +1,7 @@
 .PHONY: test clean all req cli sdl
 cc = clang
 CFLAGS     = -std=c99 -Wall -Wextra -Wpedantic -g -Iinclude
-SDL_FLAGS  = $(shell sdl2-config --cflags --libs) -lSDL2_ttf
+SDL_FLAGS  = $(shell sdl2-config --cflags --libs) -lSDL2_ttf -lSDL2_image
 
 SRC = src/jeu/main.c \
       src/jeu/tuiles.c \
