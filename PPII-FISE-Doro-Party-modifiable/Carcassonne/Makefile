@@ -94,7 +94,7 @@ $(NAME_SDL): $(SRC) $(SRC_SDL_INTERFACES)
 	$(cc) $(CFLAGS) -DAVEC_SDL $(SDL_FLAGS) $^ -o $@
 
 req:
-	apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
+	sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
 
 cli: $(NAME)
 	./$(NAME) -m 1 -p 2

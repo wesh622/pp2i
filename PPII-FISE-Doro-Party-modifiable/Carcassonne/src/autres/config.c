@@ -37,7 +37,7 @@ config* configuration(int mode, int nb_joueur, int seed, int ai,int max_turn){
 
 void print_config(config* configuration){
     if(configuration != NULL){
-        if(configuration->mode == 1){
+        if(configuration->mode == 2){
             printf("Mode: sdl \n");
         }
         else{
