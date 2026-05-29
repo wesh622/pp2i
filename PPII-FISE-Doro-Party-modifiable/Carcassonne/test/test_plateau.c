@@ -25,44 +25,68 @@ void test_init_plateau(void) {
 
 void test_peut_poser_tuile(void) {
     printf("Test peut_poser_tuile...\n");
-    
+
     Plateau *p = init_plateau();
     int centre = TAILLE_MAX / 2;
 
-    // Case déjà occupée
+    /*
+     * Tuile de depart (tuiles_jeu[0]) : a=PRAIRIE(2), b=ROUTE(1), c=ROUTE(1), d=PRAIRIE(2)
+     * Convention coordonnees : x=ligne (x+1=sud, x-1=nord), y=col (y+1=est, y-1=ouest)
+     * Compatibilite : face voisin opposee doit egal face posee (VILLE~VILLE_BOUCLIER, ROUTE~CARREFOUR)
+     */
+
+    /* --- 1. Case deja occupee --- */
     assert(peut_poser_tuile(p, tuiles_jeu[1], centre, centre) == 0);
 
-    // depasse limite
+    /* --- 2. Hors limites --- */
     assert(peut_poser_tuile(p, tuiles_jeu[1], -1, 0) == 0);
     assert(peut_poser_tuile(p, tuiles_jeu[1], TAILLE_MAX, 0) == 0);
 
-    // Case éloignée sans voisin
+    /* --- 3. Aucun voisin --- */
     assert(peut_poser_tuile(p, tuiles_jeu[1], centre+2, centre) == 0);
 
-    // Case adjacente à la tuile de départ (compatibilité OK)
-    assert(peut_poser_tuile(p, tuiles_jeu[2], centre+1, centre) == 1);
-    assert(peut_poser_tuile(p, tuiles_jeu[12], centre, centre-1) == 1);
-    assert(peut_poser_tuile(p, tuiles_jeu[2], centre, centre+1) == 1);
+    /* --- 4. Compatibilite dans les 4 directions avec la tuile de depart ---
+     *
+     * Sud (centre+1, centre) : tuile.a doit == c(ROUTE=1) de la tuile de depart
+     *   tuiles_jeu[4] = {id=5, a=ROUTE(1), b=VILLE(3), c=VILLE(3), d=VILLE(3)}  → a=1 OK
+     */
+    assert(peut_poser_tuile(p, tuiles_jeu[4], centre+1, centre) == 1);
+
+    /* Nord (centre-1, centre) : tuile.c doit == a(PRAIRIE=2) de la tuile de depart
+     *   tuiles_jeu[6] = {id=7, a=PRAIRIE(2), b=PRAIRIE(2), c=PRAIRIE(2), d=VILLE(3)} → c=2 OK
+     */
     assert(peut_poser_tuile(p, tuiles_jeu[6], centre-1, centre) == 1);
 
-    // Vérification 4 : incompatibilité avec la tuile adjacente
-    // On place une tuile à droite du centre
-    int x = centre + 1;
-    int y = centre;
-    poser_tuile(p, tuiles_jeu[1], x, y); // tuiles_jeu[1] a des faces différentes de tuiles_jeu[0]
-    // On tente de poser une tuile incompatible à gauche de celle-ci (centre, centre)
-    // On modifie une tuile pour forcer l'incompatibilité
-    Tuiles incompatible = tuiles_jeu[2];
-    incompatible.b = 99; // valeur qui ne correspondra à aucune face valide
-    assert(peut_poser_tuile(p, incompatible, centre, centre) == 0);
+    /* Est (centre, centre+1) : tuile.d doit == b(ROUTE=1) de la tuile de depart
+     *   tuiles_jeu[2] = {id=3, a=PRAIRIE(2), b=ROUTE(1), c=PRAIRIE(2), d=ROUTE(1)} → d=1 OK
+     */
+    assert(peut_poser_tuile(p, tuiles_jeu[2], centre, centre+1) == 1);
 
-    // On tente de poser une tuile compatible à gauche de celle-ci (centre, centre)
-    Tuiles compatible = tuiles_jeu[1];
-    assert(peut_poser_tuile(p, compatible, centre, centre) == 0); // déjà occupée
+    /* Ouest (centre, centre-1) : tuile.b doit == d(PRAIRIE=2) de la tuile de depart
+     *   tuiles_jeu[6] = {id=7, a=PRAIRIE(2), b=PRAIRIE(2), ...}                  → b=2 OK
+     */
+    assert(peut_poser_tuile(p, tuiles_jeu[6], centre, centre-1) == 1);
 
-    // On libère la case centrale pour tester la compatibilité
+    /* --- 5. Incompatibilite ---
+     * On place tuiles_jeu[4] au sud : sa face sud c=VILLE(3)
+     * Une tuile en (centre+2, centre) doit avoir a=VILLE(3) pour etre compatible.
+     */
+    poser_tuile(p, tuiles_jeu[4], centre+1, centre);
+
+    /* tuiles_jeu[0] : a=PRAIRIE(2) != VILLE(3) → incompatible */
+    assert(peut_poser_tuile(p, tuiles_jeu[0], centre+2, centre) == 0);
+
+    /* tuiles_jeu[13] = {id=14, a=VILLE(3), b=ROUTE(1), c=PRAIRIE(2), d=ROUTE(1)} → a=3 compatible */
+    assert(peut_poser_tuile(p, tuiles_jeu[13], centre+2, centre) == 1);
+
+    /* --- 6. Compatibilite apres liberation de la case centrale ---
+     * tuiles_jeu[4] au sud a pour face nord a=ROUTE(1).
+     * tuiles_jeu[0] : c=ROUTE(1) == a(1) de tuiles_jeu[4] → compatible
+     * tuiles_jeu[6] : c=PRAIRIE(2) != ROUTE(1)            → incompatible
+     */
     p->occupes[centre][centre] = 0;
-    assert(peut_poser_tuile(p, compatible, centre, centre) == 1);
+    assert(peut_poser_tuile(p, tuiles_jeu[0], centre, centre) == 1);
+    assert(peut_poser_tuile(p, tuiles_jeu[6], centre, centre) == 0);
 
     free_plateau(p);
     printf("  -> OK\n");
