@@ -16,13 +16,13 @@ SDL_Color couleur_sdl_face(int face) {
 
 const char* symbole_face(int face) {
     switch (face) {
-        case ROUTE_PRAIRIE:  return "RTE";
-        case PRAIRIE:        return "PRR";
-        case VILLE:          return "VIL";
-        case VILLE_BOUCLIER: return "VB!";
-        case ABBAYE:         return "ABB";
-        case CARREFOUR:      return "CRF";
-        default:             return " ? ";
+        case ROUTE_PRAIRIE:  return "ROUTE";
+        case PRAIRIE:        return "PRAIRIE";
+        case VILLE:          return "VILLE";
+        case VILLE_BOUCLIER: return "VILLE+B";
+        case ABBAYE:         return "ABBAYE";
+        case CARREFOUR:      return "CARREFOUR";
+        default:             return "?";
     }
 }
 
