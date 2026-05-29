@@ -70,7 +70,7 @@ test_plateau: $(TESTSRC_PLATEAU)
 	./$(TEST_PLATEAU)
 
 test_score: $(TESTSRC_SCORE)
-	$(cc) $(CFLAGS) $(TESTSRC_SCORE) src/jeu/score.c src/jeu/joueur.c src/jeu/plateau.c src/jeu/tuiles.c src/jeu/meeple.c -o $(TEST_SCORE)
+	$(cc) $(CFLAGS) $(TESTSRC_SCORE) src/jeu/score.c src/jeu/joueur.c src/jeu/plateau.c src/jeu/tuiles.c src/jeu/meeple.c src/jeu/pioche.c -o $(TEST_SCORE)
 	./$(TEST_SCORE)
 
 test_pioche: $(TESTSRC_PIOCHE)
