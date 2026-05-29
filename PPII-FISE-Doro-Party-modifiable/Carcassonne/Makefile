@@ -66,7 +66,7 @@ test: $(TESTOBJ) src/autres/argc.c src/autres/config.c src/jeu/joueur.c src/jeu/
 	CARCASSONNE_TEST=1 ./$(TEST)
 
 test_plateau: $(TESTSRC_PLATEAU)
-	$(cc) $(CFLAGS) $(TESTSRC_PLATEAU) src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/meeple.c src/jeu/score.c -o $(TEST_PLATEAU)
+	$(cc) $(CFLAGS) $(TESTSRC_PLATEAU) src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/meeple.c src/jeu/score.c src/jeu/pioche.c -o $(TEST_PLATEAU)
 	./$(TEST_PLATEAU)
 
 test_score: $(TESTSRC_SCORE)
@@ -86,7 +86,7 @@ test_tuile: $(TESTSRC_TUILE)
 	./$(TEST_TUILE)
 
 test_meeple: $(TESTSRC_MEEPLE)
-	$(cc) $(CFLAGS) $(TESTSRC_MEEPLE) src/jeu/meeple.c src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/score.c -o $(TEST_MEEPLE)
+	$(cc) $(CFLAGS) $(TESTSRC_MEEPLE) src/jeu/meeple.c src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/score.c src/jeu/pioche.c -o $(TEST_MEEPLE)
 	./$(TEST_MEEPLE)
 
 $(NAME_SDL): $(SRC) $(SRC_SDL_INTERFACES)

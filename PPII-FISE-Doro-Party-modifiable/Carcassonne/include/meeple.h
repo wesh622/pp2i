@@ -17,7 +17,7 @@ typedef struct _Meeple {
 
 void init_meeple(Meeple* m, int id, int idjoueur);
 int placer_meeple(Meeple* m, int posX, int posY, int zone, int emplacement);
-int peut_placer_meeple(struct _Plateau* plateau, int posX, int posY,int emplacement);
+int peut_placer_meeple(struct _Plateau* plateau, int posX, int posY, int zone, int emplacement);
 void retirer_meeple(Meeple* m);
 int meeple_disponible(Meeple* m);
 void afficher_meeple(Meeple* m);

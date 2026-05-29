@@ -37,19 +37,18 @@ int placer_meeple(Meeple* m, int posX, int posY, int zone, int emplacement){
 }
 
 // Vérifie si un meeple peut etre place a la position 
-int peut_placer_meeple(Plateau* plateau, int posX, int posY, int emplacement){
+int peut_placer_meeple(Plateau* plateau, int posX, int posY, int zone, int emplacement){
+    (void)zone;
     if(!(posX >= 0 && posX < TAILLE_MAX && posY >= 0 && posY < TAILLE_MAX)){
         return 0;
     }
-    else if(plateau->occupes[posX][posY] == 0){
+    if(plateau->occupes[posX][posY] == 0){
         return 0;
     }
-    else if(!(emplacement >= 1 && emplacement <= 5)){
+    if(!(emplacement >= 1 && emplacement <= 5)){
         return 0;
     }
-    else{
-        return 1;
-    }
+    return 1;
 }
 
 // retirer un meeple du plateau
@@ -126,7 +125,7 @@ void choix_meeple_IA(Plateau* plateau, Tuiles tuile, Joueur* j, int x, int y) {
                 if (emplacement == 5) {
                     zone = tuile.center;
                 }
-                if (peut_placer_meeple(plateau, x, y, emplacement)) {
+                if (peut_placer_meeple(plateau, x, y, zone, emplacement)) {
                     Meeple* m = premier_meeple_disponible(j);
                     placer_meeple(m, x, y, zone, emplacement);
                     return;

@@ -68,7 +68,7 @@ void premier_tour(Pioche* pioche, Plateau* plateau, Joueur* j, config* conf, int
                     zone = tuile.center;
                 }
 
-                if (peut_placer_meeple(plateau, 72, 72, emplacement)) {
+                if (peut_placer_meeple(plateau, 72, 72, zone, emplacement)) {
                     Meeple* m = premier_meeple_disponible(j);
                     placer_meeple(m, 72, 72, zone, emplacement);
                 }
@@ -159,7 +159,7 @@ void boucle_de_jeu(Pioche* pioche, Plateau* plateau, Joueur* j, config* conf, in
                     zone = tuile.center;
                 }
 
-                if (peut_placer_meeple(plateau, x, y, emplacement)) {
+                if (peut_placer_meeple(plateau, x, y, zone, emplacement)) {
                     Meeple* m = premier_meeple_disponible(j);
                     placer_meeple(m, x, y, zone, emplacement);
                     verifier_et_scorer_structures(plateau, x, y, conf->tab, total_joueurs);
