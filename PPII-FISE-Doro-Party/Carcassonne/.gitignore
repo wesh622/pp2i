@@ -1,0 +1,12 @@
+exec/
+carcassonne
+carcassonne_sdl
+test_argc
+test_plateau
+test_score
+test_pioche
+test_joueur
+test_tuile
+test_meeple
+
+test/*.o
