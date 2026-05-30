@@ -22,10 +22,21 @@ int compter_points_ville(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE
 
 int compter_points_route(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]) ;
 
-void attribuer_points_et_recuperer_meeples(int visite[TAILLE_MAX][TAILLE_MAX], int points, Joueur joueurs[], int nb_joueurs);
+void attribuer_points_et_recuperer_meeples(int visite[TAILLE_MAX][TAILLE_MAX], int points, Joueur joueurs[], int nb_joueurs, int type_zone_cible);
 
 void verifier_et_scorer_structures(Plateau* p, int x, int y, Joueur joueurs[], int nb_joueurs);
 
 void calculer_score_prairies_fin_partie(Plateau* p,Joueur joueurs[],int nb_joueurs);
+
+int compter_points_route(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]);
+
+int compter_points_ville(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]);
+
+void calculer_score_incomplet_fin_partie(Plateau* p, Joueur joueurs[], int nb_joueurs);
+
+int compter_points_ville_incomplete(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]);
+
+
+
 
 #endif

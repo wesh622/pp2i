@@ -16,7 +16,6 @@ Plateau* init_plateau(void);
 int peut_poser_tuile(Plateau* p, Tuiles t, int x, int y);
 int peut_poser_tuile_silent(Plateau* p, Tuiles* t, int x, int y);
 void poser_tuile(Plateau* p, Tuiles tuile, int x, int y);
-void afficher_plateau(Plateau* p);
 void afficher_plateau_pour_placer_tuile(Plateau* p,Pioche* pioche);
 void free_plateau(Plateau* p);
 void afficher_tour(int numero_tour, Joueur *j);

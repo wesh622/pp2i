@@ -1,4 +1,4 @@
-    #include <stdio.h>
+#include <stdio.h>
     #include <stdlib.h>
     #include <assert.h>
     #include "plateau.h"
@@ -31,15 +31,18 @@
     int peut_poser_tuile_silent(Plateau* p, Tuiles* t, int x, int y){
         if(p->occupes[x][y] == 1) return 0;
         if(x < 0 || x >= TAILLE_MAX || y < 0 || y >= TAILLE_MAX) return 0;
-        int a = 0, b = 0, c = 0, d = 0;
-        if(x > 0 && p->occupes[x-1][y]) b = 1;
-        if(x < TAILLE_MAX-1 && p->occupes[x+1][y]) a = 1;
-        if(y > 0 && p->occupes[x][y-1]) d = 1;
-        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]) c = 1;
-        int adjacence = a+b+c+d;
+        
+        int adj_nord = 0, adj_sud = 0, adj_ouest = 0, adj_est = 0;
+        if(x > 0 && p->occupes[x-1][y]) adj_nord = 1;
+        if(x < TAILLE_MAX-1 && p->occupes[x+1][y]) adj_sud = 1;
+        if(y > 0 && p->occupes[x][y-1]) adj_ouest = 1;
+        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]) adj_est = 1;
+        
+        int adjacence = adj_nord + adj_sud + adj_est + adj_ouest;
         if (adjacence == 0) return 0;
+
         // Vérification compatibilité
-        if(x < TAILLE_MAX-1 && p->occupes[x+1][y]){
+        if(adj_sud){
             int surface_bas = p->grille[x+1][y].a; //surface adjacente de la tuile en bas
             if (
                 surface_bas != t->c &&
@@ -49,7 +52,7 @@
                 return 0;
             }
         }
-        if(x > 0 && p->occupes[x-1][y]){
+        if(adj_nord){
             int surface_haut = p->grille[x-1][y].c; //surface adjacente de la tuile en haut
             if (
                 surface_haut != t->a &&
@@ -59,7 +62,7 @@
                 return 0;
             }
         }
-        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]){
+        if(adj_est){
             int surface_droite = p->grille[x][y+1].d; //surface adjacente de la tuile a droite
             if (
                 surface_droite != t->b &&
@@ -69,7 +72,7 @@
                 return 0;
             }
         }
-        if(y > 0 && p->occupes[x][y-1]){
+        if(adj_ouest){
             int surface_gauche = p->grille[x][y-1].b; //surface adjacente de la tuile a gauche
             if (
                 surface_gauche != t->d &&
@@ -95,30 +98,22 @@
             return 0;
         }
         //verification 3 : au moins une tuile adjacente ?
-        int a = 0; //tuile a droite
-        int b = 0; //tuile a gauche  
-        int c = 0; //tuile en haut
-        int d = 0; //tuile en bas
-        if(x > 0 && p->occupes[x][y-1]) {
-            b = 1;
-        }
-        if(x < TAILLE_MAX-1 && p->occupes[x][y+1]) {
-            a = 1;
-        }
-        if(y > 0 && p->occupes[x+1][y]) {
-            d = 1;
-        }
-        if(y < TAILLE_MAX-1 && p->occupes[x-1][y]) {
-            c = 1;
-        }
-        int adjacence = a+b+c+d;
+        int adj_nord = 0, adj_sud = 0, adj_ouest = 0, adj_est = 0;
+        
+        if(x > 0 && p->occupes[x-1][y]) adj_nord = 1;
+        if(x < TAILLE_MAX-1 && p->occupes[x+1][y]) adj_sud = 1;
+        if(y > 0 && p->occupes[x][y-1]) adj_ouest = 1;
+        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]) adj_est = 1;
+        
+        int adjacence = adj_nord + adj_sud + adj_est + adj_ouest;
         
         if(adjacence == 0){
             printf("Cette case n'est reliee a aucune autre tuile, veuillez en choisir une autre\n");
             return 0;
         }
+
         //verification 4 : Tuiles adjacentes compatibles
-        if(x < TAILLE_MAX-1 && p->occupes[x+1][y]){
+        if(adj_sud){
             int surface_bas = p->grille[x+1][y].a; //surface adjacente de la tuile en bas
             if (
                 surface_bas != t.c &&
@@ -129,7 +124,7 @@
                 return 0;
             }
         }
-        if(x > 0 && p->occupes[x-1][y]){
+        if(adj_nord){
             int surface_haut = p->grille[x-1][y].c; //surface adjacente de la tuile en haut
             if (
                 surface_haut != t.a &&
@@ -140,7 +135,7 @@
                 return 0;
             }
         }
-        if(y < TAILLE_MAX-1 && p->occupes[x][y+1]){
+        if(adj_est){
             int surface_droite = p->grille[x][y+1].d; //surface adjacente de la tuile a droite
             if (
                 surface_droite != t.b &&
@@ -151,7 +146,7 @@
                 return 0;
             }
         }
-        if(y > 0 && p->occupes[x][y-1]){
+        if(adj_ouest){
             int surface_gauche = p->grille[x][y-1].b; //surface adjacente de la tuile a gauche
             if (
                 surface_gauche != t.d &&
@@ -179,7 +174,7 @@
                 for(int j=1 ; j<= TAILLE_MAX-1 ;j++){
                     if(p->occupes[i][j]){
                         if (i + 1 < TAILLE_MAX && !p->occupes[i + 1][j]) {
-                            if(peut_poser_tuile(p, tuile, i+1, j)) {
+                            if(peut_poser_tuile_silent(p, &tuile, i+1, j)) {
                                 poser_tuile(p, tuile, i+1, j);
                                 verifier_et_scorer_structures(p, i+1, j, conf->tab, total_joueurs);
                                 if (au_moins_un_meeple_disponible(joueur) == 1) {
@@ -189,7 +184,7 @@
                             }
                         }
                         else if (i - 1 >= 0 && !p->occupes[i - 1][j]) {
-                            if(peut_poser_tuile(p, tuile, i-1, j)) {
+                            if(peut_poser_tuile_silent(p, &tuile, i-1, j)) {
                                 poser_tuile(p, tuile, i-1, j);
                                 verifier_et_scorer_structures(p, i-1, j, conf->tab, total_joueurs);
                                 if (au_moins_un_meeple_disponible(joueur) == 1) {
@@ -199,7 +194,7 @@
                             }
                         }
                         else if (j + 1 < TAILLE_MAX && !p->occupes[i][j + 1]) {
-                            if(peut_poser_tuile(p, tuile, i, j+1)) {
+                            if(peut_poser_tuile_silent(p, &tuile, i, j+1)) {
                                 poser_tuile(p, tuile, i, j+1);
                                 verifier_et_scorer_structures(p, i, j+1, conf->tab, total_joueurs);
                                 if (au_moins_un_meeple_disponible(joueur) == 1) {
@@ -209,7 +204,7 @@
                             }
                         }
                         else if (j - 1 >= 0 && !p->occupes[i][j - 1]) {
-                            if(peut_poser_tuile(p, tuile, i, j-1)) {
+                            if(peut_poser_tuile_silent(p, &tuile, i, j-1)) {
                                 poser_tuile(p, tuile, i, j-1);
                                 verifier_et_scorer_structures(p, i, j-1, conf->tab, total_joueurs);
                                 if (au_moins_un_meeple_disponible(joueur) == 1) {
@@ -265,10 +260,9 @@
 
  //partie MOHAMED: rajout des fonctions complémentaire de l affichage 
 
-
  // Convertit une face de tuile en caractère pour l'affichage
 char face_vers_char(int face) {
-    switch(face) { //j'ai essayer de me baser sur les infos donner par antoine dans tuiles.h pour faire la correspondance entre les int et les types de faces mais je ne suis pas sur que ce soit correct, a verifier   
+    switch(face) {
         case 1: return 'R'; // route_prairie
         case 2: return 'P'; // prairie
         case 3: return 'V'; // ville
@@ -350,35 +344,35 @@ int ville_recursive(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]
     visite[x][y] = 1; // On marque la tuile comme visitée
     Tuiles t = p->grille[x][y];
 
-    // Vérification du NORD (a)
+    // Vérification du NORD (a) -> x-1
     if (t.a == VILLE || t.a == VILLE_BOUCLIER) {
-        if (y + 1 >= TAILLE_MAX || p->occupes[x][y+1] == 0 || (p->grille[x][y+1].c != VILLE && p->grille[x][y+1].c != VILLE_BOUCLIER)) 
+        if (x - 1 < 0 || p->occupes[x-1][y] == 0 || (p->grille[x-1][y].c != VILLE && p->grille[x-1][y].c != VILLE_BOUCLIER)) 
             return 0; // Bord vide ou type incompatible
+        if (!ville_recursive(p, x-1, y, visite)) {
+            return 0;
+        } 
+    }
+    // Vérification de l'EST (b) -> y+1
+    if (t.b == VILLE || t.b == VILLE_BOUCLIER) {
+        if (y + 1 >= TAILLE_MAX || p->occupes[x][y+1] == 0 || (p->grille[x][y+1].d != VILLE && p->grille[x][y+1].d != VILLE_BOUCLIER)) 
+            return 0;
         if (!ville_recursive(p, x, y+1, visite)) {
             return 0;
         } 
     }
-    // Vérification de l'EST (b)
-    if (t.b == VILLE || t.b == VILLE_BOUCLIER) {
-        if (x + 1 >= TAILLE_MAX || p->occupes[x+1][y] == 0 || (p->grille[x+1][y].d != VILLE && p->grille[x+1][y].d != VILLE_BOUCLIER)) 
+    // Vérification du SUD (c) -> x+1
+    if (t.c == VILLE || t.c == VILLE_BOUCLIER) {
+        if (x + 1 >= TAILLE_MAX || p->occupes[x+1][y] == 0 || (p->grille[x+1][y].a != VILLE && p->grille[x+1][y].a != VILLE_BOUCLIER)) 
             return 0;
         if (!ville_recursive(p, x+1, y, visite)) {
             return 0;
-        } 
-    }
-    // Vérification du SUD (c)
-    if (t.c == VILLE || t.c == VILLE_BOUCLIER) {
-        if (y - 1 < 0 || p->occupes[x][y-1] == 0 || (p->grille[x][y-1].a != VILLE && p->grille[x][y-1].a != VILLE_BOUCLIER)) 
-            return 0;
-        if (!ville_recursive(p, x, y-1, visite)) {
-            return 0;
         }
     }
-    // Vérification de l'OUEST (d)
+    // Vérification de l'OUEST (d) -> y-1
     if (t.d == VILLE || t.d == VILLE_BOUCLIER) {
-        if (x - 1 < 0 || p->occupes[x-1][y] == 0 || (p->grille[x-1][y].b != VILLE && p->grille[x-1][y].b != VILLE_BOUCLIER)) 
+        if (y - 1 < 0 || p->occupes[x][y-1] == 0 || (p->grille[x][y-1].b != VILLE && p->grille[x][y-1].b != VILLE_BOUCLIER)) 
             return 0;
-        if (!ville_recursive(p, x-1, y, visite)) {
+        if (!ville_recursive(p, x, y-1, visite)) {
             return 0;
         }
     }
@@ -399,7 +393,7 @@ int route_recursive(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]
     visite[x][y] = 1; // On marque la tuile comme visitée
     Tuiles t = p->grille[x][y];
 
-    // Vérification du NORD (a)
+    // Vérification du NORD (a) -> x-1
     if (t.a == ROUTE_PRAIRIE) { // Si le côté Nord est une route
         if (x - 1 < 0 || p->occupes[x-1][y] == 0 || p->grille[x-1][y].c != ROUTE_PRAIRIE) {
             return 0; // Vide ou pas de route en face
@@ -409,30 +403,30 @@ int route_recursive(Plateau* p, int x, int y, int visite[TAILLE_MAX][TAILLE_MAX]
         } 
     }
 
-    // Vérification de l'EST (b)
+    // Vérification de l'EST (b) -> y+1
     if (t.b == ROUTE_PRAIRIE) {
         if (y + 1 >= TAILLE_MAX || p->occupes[x][y+1] == 0 || p->grille[x][y+1].d != ROUTE_PRAIRIE) {
             return 0;
         }
-        if (route_recursive(p, x , y + 1 , visite) == 0) {
+        if (route_recursive(p, x, y+1, visite) == 0) {
             return 0;
         }
     }
 
-    // Vérification du SUD (c)
+    // Vérification du SUD (c) -> x+1
     if (t.c == ROUTE_PRAIRIE) {
-        if (x+1  >= TAILLE_MAX || p->occupes[x+1][y] == 0 || p->grille[x+1][y].a != ROUTE_PRAIRIE) {
+        if (x + 1 >= TAILLE_MAX || p->occupes[x+1][y] == 0 || p->grille[x+1][y].a != ROUTE_PRAIRIE) {
             return 0;
         }
         if (route_recursive(p, x+1, y, visite) == 0) return 0;
     }
 
-    // Vérification de l'OUEST (d)
+    // Vérification de l'OUEST (d) -> y-1
     if (t.d == ROUTE_PRAIRIE) {
         if (y - 1 < 0 || p->occupes[x][y-1] == 0 || p->grille[x][y-1].b != ROUTE_PRAIRIE) {
             return 0;
         }
-        if (route_recursive(p, x , y-1, visite) == 0) {
+        if (route_recursive(p, x, y-1, visite) == 0) {
             return 0;
         }
     }

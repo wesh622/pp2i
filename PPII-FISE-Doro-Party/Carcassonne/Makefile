@@ -36,6 +36,9 @@ TEST_TUILE = test_tuile
 TESTSRC_MEEPLE = test/test_meeple.c
 TEST_MEEPLE = test_meeple
 
+TESTSRC_AFFICHAGE = test/test_affichage.c
+TEST_AFFICHAGE = test_affichage
+
 NAME = carcassonne
 TEST = test_argc
 
@@ -54,7 +57,7 @@ test: $(TESTOBJ) src/autres/argc.c src/autres/config.c src/jeu/joueur.c src/jeu/
 	./$(TEST)
 
 test_plateau: $(TESTSRC_PLATEAU)
-	$(cc) $(CFLAGS) $(TESTSRC_PLATEAU) src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/meeple.c src/jeu/score.c -o $(TEST_PLATEAU)
+	$(cc) $(CFLAGS) $(TESTSRC_PLATEAU) src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/meeple.c src/jeu/score.c src/jeu/pioche.c src/jeu/affichage.c -o $(TEST_PLATEAU)
 	./$(TEST_PLATEAU)
 
 test_score: $(TESTSRC_SCORE)
@@ -74,8 +77,12 @@ test_tuile: $(TESTSRC_TUILE)
 	./$(TEST_TUILE)
 
 test_meeple: $(TESTSRC_MEEPLE)
-	$(cc) $(CFLAGS) $(TESTSRC_MEEPLE) src/jeu/meeple.c src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/score.c -o $(TEST_MEEPLE)
+	$(cc) $(CFLAGS) $(TESTSRC_MEEPLE) src/jeu/meeple.c src/jeu/plateau.c src/jeu/pioche.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/score.c -o $(TEST_MEEPLE)
 	./$(TEST_MEEPLE)
+
+test_affichage: $(TESTSRC_AFFICHAGE)
+	$(cc) $(CFLAGS) $(TESTSRC_AFFICHAGE) src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/meeple.c src/jeu/score.c src/jeu/pioche.c src/jeu/affichage.c src/autres/config.c -o $(TEST_AFFICHAGE)
+	./$(TEST_AFFICHAGE)
 
 cli: $(NAME)
 	./$(NAME) -m 1 -p 2
@@ -84,5 +91,5 @@ sdl: $(NAME)
 	./$(NAME) -m 2 -p 2
 
 clean:
-	rm -rf exec $(TESTOBJ) $(NAME) $(TEST) $(TEST_PLATEAU) $(TEST_SCORE) $(TEST_PIOCHE) $(TEST_JOUEUR) $(TEST_TUILE) $(TEST_MEEPLE)
+	rm -rf exec $(TESTOBJ) $(NAME) $(TEST) $(TEST_PLATEAU) $(TEST_SCORE) $(TEST_PIOCHE) $(TEST_JOUEUR) $(TEST_TUILE) $(TEST_MEEPLE) $(TEST_AFFICHAGE)
 	

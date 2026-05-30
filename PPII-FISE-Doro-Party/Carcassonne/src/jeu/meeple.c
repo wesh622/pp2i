@@ -19,6 +19,7 @@ void init_meeple(Meeple* m, int id, int idjoueur){
     m->emplacement = 0;
     m->posX = -1; 
     m->posY = -1;
+    m->type_zone = 0;
 }
 
 // Placement d'un meeple sur le plateau
@@ -28,7 +29,7 @@ int placer_meeple(Meeple* m, int posX, int posY, int zone, int emplacement){
     }
     else{
         m->etat = 0; 
-        m->zone = zone; 
+        m->zone = zone;
         m->emplacement = emplacement;
         m->posX = posX; 
         m->posY = posY;

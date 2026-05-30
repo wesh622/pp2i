@@ -13,7 +13,9 @@ typedef struct _Meeple {
     int emplacement; //1=a 2=b 3=c 4=d 5=centre
     int posX; //coord X (-1 si pa pose)
     int posY; //coord Y (-1 si pa pose)
+    int type_zone; // NOUVEAU : 1 = Route, 2 = Ville, 3 = Abbaye, 4 = Prairie
 } Meeple;
+
 
 void init_meeple(Meeple* m, int id, int idjoueur);
 int placer_meeple(Meeple* m, int posX, int posY, int zone, int emplacement);

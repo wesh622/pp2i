@@ -40,10 +40,9 @@ void premier_tour(Pioche* pioche, Plateau* plateau, Joueur* j, config* conf, int
             }
     poser_tuile(plateau, tuile, 72, 72);
     if (au_moins_un_meeple_disponible(j) == 1) {
-            // On demande si le joueur veut placer un pion
             char response;
             printf("Voulez-vous placer un meeple sur cette tuile ? (Y/N)\n");
-            scanf(" %c", &response); // espace avant %c pour ignorer les retours à la ligne
+            scanf(" %c", &response); 
             if (response == 'Y' || response == 'y') {
                 int zone = 0;
                 int emplacement = 0;
@@ -122,19 +121,16 @@ void boucle_de_jeu(Pioche* pioche, Plateau* plateau, Joueur* j, config* conf, in
             printf("Y (colonne): ");
             scanf("%d", &y);
 
-            // x = ligne, y = colonne
             if(peut_poser_tuile(plateau, tuile, x, y)){
                 poser_tuile(plateau, tuile, x, y);
                 placement_ok = 1;
-                verifier_et_scorer_structures(plateau, x, y, conf->tab, total_joueurs);
             }
         }
 
         if (au_moins_un_meeple_disponible(j) == 1) {
-            // On demande si le joueur veut placer un pion
             char response;
             printf("Voulez-vous placer un meeple sur cette tuile ? (Y/N)\n");
-            scanf(" %c", &response); // espace avant %c pour ignorer les retours à la ligne
+            scanf(" %c", &response); 
             if (response == 'Y' || response == 'y') {
                 int zone = 0;
                 int emplacement = 0;
@@ -162,18 +158,17 @@ void boucle_de_jeu(Pioche* pioche, Plateau* plateau, Joueur* j, config* conf, in
                 if (peut_placer_meeple(plateau, x, y, emplacement)) {
                     Meeple* m = premier_meeple_disponible(j);
                     placer_meeple(m, x, y, zone, emplacement);
-                    verifier_et_scorer_structures(plateau, x, y, conf->tab, total_joueurs);
                 }
             }
         }
+        
+        verifier_et_scorer_structures(plateau, x, y, conf->tab, total_joueurs);
     }
     else if (j->est_IA == 1) {
         choix_case_IA(plateau, tuile, j, conf, total_joueurs);
     }
     afficher_scores(conf->tab, total_joueurs);
 }
-
-
 
 
 int main(int argc, char** argv){
@@ -190,14 +185,10 @@ int main(int argc, char** argv){
     int total_joueurs = conf->nbr_joueur + conf->ai;
 
     afficher_plateau_cli_ameliore(plateau, conf->tab, total_joueurs);
-    printf("%d", conf->max_turn);
-
-    // Premier tour : 
 
     premier_tour(pioche, plateau, &conf->tab[0], conf, total_joueurs);
 
-    // Boucle de jeu :
-    for (int i = 1; i < 4; i++) {
+    for (int i = 1; i < conf->max_turn ; i++) {
         int tour = i+1;
         printf("\n=== TOUR N°%d ===\n", tour );
         int joueur_actuel = i % total_joueurs;
@@ -205,12 +196,12 @@ int main(int argc, char** argv){
         boucle_de_jeu(pioche, plateau, j, conf, total_joueurs);
     }
 
-    // Fin de game :
+    calculer_score_incomplet_fin_partie(plateau, conf->tab, total_joueurs);
+
     calculer_score_prairies_fin_partie(plateau, conf->tab,total_joueurs);
     afficher_plateau_cli_ameliore(plateau, conf->tab, total_joueurs);
     afficher_fin_de_partie(conf->tab, total_joueurs);
 
-    // Libération mémoire
     free_pioche(pioche);
     free_plateau(plateau);
     free_config(conf);

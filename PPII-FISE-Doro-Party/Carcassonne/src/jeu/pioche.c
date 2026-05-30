@@ -44,7 +44,7 @@ Tuiles* piocher(Pioche* p){
     p->indicecourant++;
     p->nbresrestantes--;
     
-    printf("Tuile %d piochee (%d restantes)\n",tuile->id,p->nbresrestantes);
+    printf("Tuile %d piochee (%d restantes)\n",tuile->id,p->nbresrestantes+1);
     
     return tuile;
 }
