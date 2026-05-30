@@ -1,6 +1,7 @@
 .PHONY: test clean all req cli sdl
 cc = clang
 CFLAGS = -std=c99 -Wall -Wextra -Wpedantic -g -Iinclude
+SDL_FLAGS  = $(shell sdl2-config --cflags --libs) -lSDL2_ttf -lSDL2_image
 
 SRC = src/jeu/main.c \
       src/jeu/tuiles.c \
@@ -12,6 +13,16 @@ SRC = src/jeu/main.c \
       src/autres/argc.c \
       src/autres/config.c \
 	  src/jeu/meeple.c
+
+SRC_SDL_INTERFACES = src/interfaces/SDL/sdl_init.c \
+                     src/interfaces/SDL/sdl_rendu.c \
+                     src/interfaces/SDL/sdl_plateau.c \
+                     src/interfaces/SDL/sdl_panel.c \
+                     src/interfaces/SDL/sdl_input.c \
+                     src/interfaces/SDL/sdl_meeple_overlay.c \
+                     src/interfaces/SDL/sdl_boucle.c \
+                     src/interfaces/SDL/sdl_fin.c \
+                     src/interfaces/SDL/sdl_accueil.c
 
 OBJ = $(SRC:%.c=exec/%.o)
 
@@ -40,6 +51,7 @@ TESTSRC_AFFICHAGE = test/test_affichage.c
 TEST_AFFICHAGE = test_affichage
 
 NAME = carcassonne
+NAME_SDL = carcassonne_sdl
 TEST = test_argc
 
 all: $(NAME)
@@ -51,6 +63,9 @@ exec/%.o: %.c
 $(NAME): $(OBJ)
 	$(cc) $(CFLAGS) $(OBJ) -o $(NAME)
 
+$(NAME_SDL): $(SRC) $(SRC_SDL_INTERFACES)
+	@mkdir -p exec
+	$(cc) $(CFLAGS) -DAVEC_SDL $(SDL_FLAGS) $^ -o $@
 
 test: $(TESTOBJ) src/autres/argc.c src/autres/config.c src/jeu/joueur.c src/jeu/meeple.c
 	CARCASSONNE_TEST=1 $(cc) $(CFLAGS) $(TESTSRC) src/autres/argc.c src/autres/config.c src/jeu/joueur.c src/jeu/meeple.c -o $(TEST)	
@@ -84,12 +99,16 @@ test_affichage: $(TESTSRC_AFFICHAGE)
 	$(cc) $(CFLAGS) $(TESTSRC_AFFICHAGE) src/jeu/plateau.c src/jeu/tuiles.c src/jeu/joueur.c src/jeu/meeple.c src/jeu/score.c src/jeu/pioche.c src/jeu/affichage.c src/autres/config.c -o $(TEST_AFFICHAGE)
 	./$(TEST_AFFICHAGE)
 
+req:
+	sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
+
 cli: $(NAME)
 	./$(NAME) -m 1 -p 2
 
-sdl: $(NAME)
-	./$(NAME) -m 2 -p 2
+sdl: $(NAME_SDL)
+	./$(NAME_SDL) -m 2 -p 2
 
 clean:
-	rm -rf exec $(TESTOBJ) $(NAME) $(TEST) $(TEST_PLATEAU) $(TEST_SCORE) $(TEST_PIOCHE) $(TEST_JOUEUR) $(TEST_TUILE) $(TEST_MEEPLE) $(TEST_AFFICHAGE)
+	rm -rf exec $(TESTOBJ) $(NAME) $(NAME_SDL) $(TEST) $(TEST_PLATEAU) $(TEST_SCORE) $(TEST_PIOCHE) $(TEST_JOUEUR) $(TEST_TUILE) $(TEST_MEEPLE) $(TEST_AFFICHAGE)
+
 	
