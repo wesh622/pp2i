@@ -20,6 +20,9 @@
                 p->occupes[i][j] = 0;
             }
         }
+        int centre = TAILLE_MAX / 2;
+        p->grille[centre][centre] = tuiles_jeu[0];
+        p->occupes[centre][centre] = 1;
         
         printf("Plateau initialise\n");
         

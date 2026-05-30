@@ -4,6 +4,8 @@
 #include "plateau.h"
 #include "pioche.h"
 #include "argc.h"
+#include "sdl_init.h"      
+#include "sdl_plateau.h"
 
 static void tout_afficher(ContexteSDL* ctx, Plateau* plateau, Pioche* pioche,config* conf, Tuiles* tuile, int tour,int total_joueurs, Joueur* j, VueSDL* vue);
 static int tuile_placable_quelque_part(Plateau* p, Tuiles* t);
