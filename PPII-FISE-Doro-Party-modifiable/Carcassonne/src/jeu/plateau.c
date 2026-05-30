@@ -21,8 +21,12 @@
             }
         }
         
-        printf("Plateau initialise\n");
-        
+        int centre = TAILLE_MAX/2;
+        p->grille[centre][centre] = tuiles_jeu[0];
+        p->occupes[centre][centre] = 1;
+
+        printf("Plateau initialise. Tuile de depart en (%d,%d)\n", centre, centre);
+
         return p;
     }
 
