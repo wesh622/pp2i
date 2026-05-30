@@ -137,13 +137,36 @@ void verifier_et_scorer_structures(Plateau* p, int x, int y, Joueur joueurs[], i
             attribuer_points_et_recuperer_meeples(visite, pts, joueurs, nb_joueurs, VILLE);
         }
     }
-    // routes
-    if (t.a == ROUTE_PRAIRIE || t.b == ROUTE_PRAIRIE ||
-        t.c == ROUTE_PRAIRIE || t.d == ROUTE_PRAIRIE) {
+    // routes standard (tuile normale)
+    if (t.center != CARREFOUR && (t.a == ROUTE_PRAIRIE || t.b == ROUTE_PRAIRIE ||
+        t.c == ROUTE_PRAIRIE || t.d == ROUTE_PRAIRIE)) {
         if (verifie_route_complete(p, x, y)) {
             memset(visite, 0, sizeof(visite));
             int pts = compter_points_route(p, x, y, visite);
             attribuer_points_et_recuperer_meeples(visite, pts, joueurs, nb_joueurs, ROUTE_PRAIRIE);
+        }
+    }
+    // carrefour : verifie chaque branche de route separement
+    // route_recursive retourne 1 sur une case deja visitee -> pre-marquer le carrefour
+    // le fait agir comme terminal sans modifié plateau.c
+    if (t.center == CARREFOUR) {
+        int dir_x[4] = {-1, 0, 1, 0};
+        int dir_y[4] = {0, 1, 0, -1};
+        int faces[4] = {t.a, t.b, t.c, t.d};
+        for (int d = 0; d < 4; d++) {
+            if (faces[d] != ROUTE_PRAIRIE) continue;
+            int nx = x + dir_x[d];
+            int ny = y + dir_y[d];
+            if (nx < 0 || nx >= TAILLE_MAX || ny < 0 || ny >= TAILLE_MAX) continue;
+            if (!p->occupes[nx][ny]) continue;
+            memset(visite, 0, sizeof(visite));
+            visite[x][y] = 1; // carrefour = terminal
+            if (route_recursive(p, nx, ny, visite)) {
+                memset(visite, 0, sizeof(visite));
+                visite[x][y] = 1;
+                int pts = 1 + compter_points_route(p, nx, ny, visite);
+                attribuer_points_et_recuperer_meeples(visite, pts, joueurs, nb_joueurs, ROUTE_PRAIRIE);
+            }
         }
     }
 }
