@@ -135,7 +135,7 @@ void boucle_sdl_principale(Plateau* plateau, Pioche* pioche,
     }
 
     if (!quitter) {
-        score_final(plateau, conf->tab, total_joueurs);
+        calculer_score_prairies_fin_partie(plateau, conf->tab, total_joueurs);
         tout_afficher(ctx, plateau, pioche, conf, NULL, conf->max_turn,
                       total_joueurs, &conf->tab[0], &vue);
         sdl_afficher_fin_de_partie(ctx, conf->tab, total_joueurs);

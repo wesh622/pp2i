@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include "argc.h"
 #include "affichage.h"
+#ifdef AVEC_SDL
+#include "sdl_boucle.h"
+#endif
 
 void premier_tour(Pioche* pioche, Plateau* plateau, Joueur* j, config* conf, int total_joueurs) {
     Tuiles* tuile_ptr = piocher(pioche);
@@ -183,6 +186,16 @@ int main(int argc, char** argv){
     if(!pioche) { free_plateau(plateau); free_config(conf); return 1; }
 
     int total_joueurs = conf->nbr_joueur + conf->ai;
+
+    #ifdef AVEC_SDL
+    if (conf->mode == 2) {
+        boucle_sdl_principale(plateau, pioche, conf, total_joueurs);
+        free_pioche(pioche);
+        free_plateau(plateau);
+        free_config(conf);
+        return 0;
+    }
+    #endif
 
     afficher_plateau_cli_ameliore(plateau, conf->tab, total_joueurs);
 
