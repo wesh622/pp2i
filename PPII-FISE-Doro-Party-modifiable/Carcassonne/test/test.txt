@@ -1,6 +1,0 @@
-Ce dossier contiendra l'ensemble des tests unitaires en .c 
-
-La majorité des fichiers test ont été générés a l'aide de l'ia
-
-On decrit à l'ia l'ensemble des cas à verifier, cas limite etc... en precisant les resultats attendus et le code est générés a partir de cela
-

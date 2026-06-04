@@ -8,5 +8,5 @@ test_pioche
 test_joueur
 test_tuile
 test_meeple
-
+.DS_Store
 test/*.o
